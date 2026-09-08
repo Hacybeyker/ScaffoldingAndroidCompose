@@ -17,9 +17,9 @@
 | **DI** | Hilt (módulo Hilt por feature, `@Binds` a interfaces de domain) |
 | **Persistencia Local** | Room para datos estructurados + DataStore para preferencias (agregar al catálogo cuando se necesiten) |
 | **Concurrencia** | Kotlin Coroutines + Flow (`StateFlow` en ViewModels, dispatchers inyectados) |
-| **Testing** | JUnit + Turbine + Fakes (unitarios JVM) / Screenshot Testing (UI) |
+| **Testing** | JUnit + Turbine + Fakes escritos a mano (unitarios JVM) · Robolectric + Roborazzi para goldens de UI, commiteados en `app/src/test/screenshots/` |
 | **Principios** | SOLID + Patrones de Diseño (Repository, Factory, Observer, etc.) |
-| **Calidad** | ktlint + detekt + Android Lint |
+| **Calidad** | ktlint + detekt + Android Lint · gate de cobertura Kover (90%) · SonarCloud en CI |
 
 ---
 
@@ -37,8 +37,11 @@
 ```
 
 - **Package base**: `{{PACKAGE_NAME}}`
-- **Build**: `./gradlew assembleDebug` · **Tests**: `./gradlew test`
+- **Build**: `./gradlew assembleDebug` · **Tests**: `./gradlew test` (unitarios + screenshots, solo JVM)
 - **Calidad (obligatorio antes de commit)**: `./gradlew formatAndAnalyze` (ktlint + detekt + Android Lint)
+- **Gates que un cambio debe pasar**: `./gradlew koverVerifyDebug` (cobertura) y `./gradlew verifyRoborazziDebug` (goldens); re-basifica un cambio visual intencional con `./gradlew recordRoborazziDebug`
+- **Reportes**: `./gradlew qualityReports --continue` genera el HTML de Lint, detekt, ktlint y Kover en `app/build/reports/` e imprime las rutas. El mismo build deja el XML que consume Sonar
+- **Sin tests instrumentados**: no existe el source set `androidTest`. El código que depende de hardware (cámara, GPS, biometría, sensores) se verifica a mano en un dispositivo y se excluye del gate de cobertura
 
 ---
 
@@ -62,7 +65,9 @@ Cada pantalla es dirigida por un estado inmutable:
 - **Strings**: prohibido hardcodear. Usar `stringResource(R.string.*)`.
 - **Estilos**: prohibido hardcodear colores/dp/sp en Composables. Usar los tokens de `core/ui/theme/` (`MaterialTheme.colorScheme/typography/shapes/spacing`).
 - **Imports**: prohibidos los wildcards (`import x.*`) y las trailing commas (ktlint lo aplica en el build).
-- **Dependencias**: siempre en `gradle/libs.versions.toml` con `version.ref`; solo versiones **estables**.
+- **Dependencias**: siempre en `gradle/libs.versions.toml` con `version.ref`; solo versiones **estables**. Sin comentarios inline en el catálogo: las entradas se autodescriben por su nombre.
+- **Naming**: nunca sufijes una clase con `Impl` (`XxxRepositoryImpl`) — es una etiqueta que no dice nada de la implementación. Nómbrala por lo que la respalda (`RoomBookRepository`, `AndroidCameraPermissionRepository`, `InMemoryGreetingRepository`); es el mismo criterio que hace legibles los dobles de test (`Fake…`, `Stub…`).
+- **Comentarios**: por defecto ninguno. Comenta solo lo no obvio (el *porqué*, una decisión, una advertencia), nunca lo que el nombre ya dice.
 
 ### 4. SOLID & Patrones de Diseño
 - **SRP**: una clase, una responsabilidad (UseCases pequeños, un Mapper por transformación).
@@ -93,11 +98,13 @@ Para **revisar código implementado** (code review contra los estándares de est
 2. **Domain primero**: model + usecase + interfaz, con tests unitarios.
 3. **Data del slice**: sources + mapper + repo impl + módulo Hilt.
 4. **UI del slice**: UiState/Intents + ViewModel + Screen/Content; registra el NavKey en `AppNavHost`.
-5. **Tests**: unitarios para la lógica nueva; screenshot test si hay UI visual relevante.
-6. **Verifica**: `./gradlew formatAndAnalyze` y `./gradlew test` en verde.
+5. **Tests**: unitarios para la lógica nueva; golden de Roborazzi si hay UI visual relevante (grábalo y commitéalo).
+6. **Verifica**: `./gradlew formatAndAnalyze test koverVerifyDebug verifyRoborazziDebug` en verde.
 7. **Documenta**: entrada en `CHANGELOG.md` bajo `[Unreleased]` (`Added/Fixed/Changed/Enhancement/Security`).
 
 **Commits — agrupa por unidad funcional, no por archivo.** Típicamente por capa (`domain` / `data` / `ui`) o sub-objetivo; cada commit compila y pasa calidad + tests. Una feature/fix a la vez.
+
+**La IA no commitea.** Al terminar, deja los cambios en el working tree y entrega la descripción del commit (Conventional Commits, imperativo, <72 caracteres) para que la ejecute la persona.
 
 ---
 
@@ -108,7 +115,11 @@ Para **revisar código implementado** (code review contra los estándares de est
 - ❌ **NO** uses `@Preview` en funciones de Screen (solo en Content con fakes).
 - ❌ **NO** uses `fallbackToDestructiveMigration` en código real (migraciones Room versionadas).
 - ❌ **NO** hardcodees secretos (API keys, tokens, passwords) ni guardes credenciales en texto plano. Ver [Guía de Seguridad](.agents/skills/android-best-practices/references/MOBILE_SECURITY_GUIDE.md).
-- ❌ **NO** agregues dependencias `alpha/beta/rc/snapshot` al catálogo.
+- ❌ **NO** agregues dependencias `alpha/beta/rc/snapshot` al catálogo. Si la única versión publicada es pre-release, la librería no entra; una excepción exige autorización explícita y quedar documentada aquí con su contención (fallback).
+  - **Excepción vigente — `detekt = 2.0.0-alpha.x`**: la rama 1.23.x no soporta Kotlin 2.4, así que la alternativa a la alpha es quedarse sin detekt. Contención: `config/detekt/detekt.yml` corre con `config.validation: false` para tolerar renombres de reglas entre alphas, y `buildUponDefaultConfig = true` limita la superficie propia a los overrides del fichero. Se vuelve a estable en cuanto detekt 2.0.0 publique GA.
+- ❌ **NO** ejecutes la app en un emulador ni en un dispositivo físico. La verificación automatizada llega hasta `assembleDebug` + `test`; lo que necesita hardware lo prueba la persona, así que indícale qué abrir y qué observar.
+- ❌ **NO** hagas `git commit`, `push`, `tag` ni `merge` por tu cuenta. Deja los cambios sin commitear y entrega el mensaje sugerido.
+- ❌ **NO** bajes un gate para que pase el build (ni `abortOnError = false`, ni bajar `minBound`, ni `ignoreFailures`). Arregla la causa.
 
 ---
 **Standard Android Config** — {{PROJECT_NAME}}

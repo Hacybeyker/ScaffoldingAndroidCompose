@@ -38,6 +38,7 @@ El script pregunta:
 | 📌 Nombre del Proyecto | `MiAppGenial` | PascalCase, sin espacios ni guiones |
 | 📦 Package base | `com.empresa.miapp` | Minúsculas separadas por puntos |
 | 🏷️ Nombre visible de la app | `Mi App Genial` | Libre (puede tener espacios). Default: el nombre del proyecto |
+| 🐙 Usuario u org de GitHub | `mi-empresa` | Opcional. Alimenta los badges del README, los links del CHANGELOG y, por defecto, `sonar.organization` |
 
 Al final pregunta por **una limpieza opcional** (recomendada):
 
@@ -60,10 +61,26 @@ Y aplica **automáticamente** estas tareas (no necesitas hacer nada):
   --name MiAppGenial \
   --package com.empresa.miapp \
   --app-name "Mi App Genial" \
+  --github-user mi-empresa \
   --yes
 ```
 
 Con `--yes` no se hacen preguntas: se confirma todo y se eliminan los archivos del scaffolding. El manejo de git sigue siendo automático.
+
+### Todo lo específico del proyecto es dinámico
+
+Ningún valor del autor de la plantilla sobrevive al init. Estos son los cuatro datos de entrada y lo que deriva de cada uno:
+
+| Entrada | Deriva |
+|---------|--------|
+| `--name` | `rootProject.name`, theme Compose, `sonar.projectName`, nombre de la carpeta raíz, ficheros `.iml` |
+| `--package` | `namespace`, `applicationId`, declaraciones `package`/`import`, patrones de clases de Kover, `sonar.projectKey` |
+| `--app-name` | `app_name` en `strings.xml` (lo que se ve en el launcher) |
+| `--github-user` | Badges del README, links del CHANGELOG y, si no pasas `--sonar-org`, `sonar.organization` |
+
+`--sonar-org` solo hace falta cuando tu organización de SonarCloud **no** coincide con la de GitHub (SonarCloud crea la organización con la clave de la de GitHub, así que normalmente coinciden).
+
+Si omites `--github-user` y `--sonar-org`, el script deja los placeholders `TU_USUARIO` y `TU_ORG_SONAR`, y **te los lista al terminar** para que no acaben publicados.
 
 ## 4. ¿Qué modifica exactamente el script?
 
@@ -74,7 +91,11 @@ Con `--yes` no se hacen preguntas: se confirma todo y se eliminan los archivos d
 | **Android** | `app/src/main/res/values/strings.xml` | `app_name` (nombre visible) |
 | **Android** | `app/src/main/res/values/themes.xml` | Nombre del theme XML |
 | **Kotlin** | `app/src/**` | Declaraciones `package`/`import`, nombre del theme Compose y **carpetas movidas** al nuevo package |
+| **Kotlin** | `app/src/**/*.kt` | Imports **reordenados** (el package nuevo puede caer antes o después de `androidx`; ktlint los exige lexicográficos) |
 | **Ejemplo** | `feature/home/**` (main + test) | Slice de ejemplo eliminado; `HomeScreen` mínimo restaurado |
+| **Screenshots** | `app/src/test/screenshots/` | Goldens del ejemplo eliminados (se regeneran con `recordRoborazziDebug`) |
+| **Cobertura** | `app/build.gradle.kts` | Patrones de clases de Kover (`<package>.*.domain.*`, `.data.*`, `*ViewModel*`) |
+| **SonarCloud** | `build.gradle.kts` | `projectKey` (del package), `projectName` (del nombre) y `{{SONAR_ORG}}` (de `--sonar-org` o `--github-user`) |
 | **Docs IA** | `AGENTS.md`, `.agents/**` | Placeholders `{{PROJECT_NAME}}`, `{{PACKAGE_NAME}}`, `{{MODULE_NAME}}`, `{{PACKAGE_PATH}}`, `{{PROJECT_ROOT}}` |
 | **IDE/IA** | `.claude/`, `.cursor/`, `.github/copilot/`, `.jetbrains/`, `.junie/`, `.antigravity/`, `.agent/` | Symlinks hacia `.agents/skills/` (vía `sync-skills.sh`) |
 | **IntelliJ/Android Studio** | `.idea/*.iml`, `.idea/modules.xml`, `.idea/.name` | Renombrados con el nuevo nombre del proyecto |
@@ -93,12 +114,26 @@ grep -ri "scaffoldingandroidcompose\|com.hacybeyker" --exclude-dir=.git --exclud
 # 2. El proyecto compila
 ./gradlew assembleDebug
 
-# 3. Los tests pasan
+# 3. Los tests pasan (unitarios + screenshots, todo en JVM)
 ./gradlew test
 
 # 4. La calidad de código está en verde (ktlint + detekt + Android Lint)
 ./gradlew codeQuality
+
+# 5. Los gates pasan (cobertura y goldens)
+./gradlew koverVerifyDebug verifyRoborazziDebug
+
+# 6. Los reportes HTML se generan (imprime las rutas file:// al terminar)
+./gradlew qualityReports --continue
 ```
+
+> **Sonar es opt-in:** el paso del CI está guardado por `if: env.SONAR_TOKEN != ''`. Sin el secret no
+> se sube nada y el CI queda verde. Para activarlo, importa el repo en
+> [sonarcloud.io](https://sonarcloud.io), **desactiva Automatic Analysis** y añade el secret
+> `SONAR_TOKEN` (más la variable de repo `SONAR_HOST_URL` si tu instancia es self-hosted).
+>
+> **Primer golden:** cuando añadas tu primer screenshot test, genera la línea base con
+> `./gradlew recordRoborazziDebug` y **commitea los PNG** — `verifyRoborazziDebug` compara contra ellos.
 
 ## 6. Empezar a desarrollar con IA
 

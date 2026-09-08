@@ -19,10 +19,15 @@ Clona, ejecuta un script, y en menos de un minuto tienes un proyecto Android con
 | **`AGENTS.md`** | Fuente de verdad para agentes de IA (estándar [agents.md](https://agents.md/)) |
 | **`.agents/`** | Skills de IA: android-best-practices, feature-implementation, code-reviewer, commits semánticos, changelog, creación de skills |
 | **Symlinks multi-IDE** | Las skills se sincronizan automáticamente para Claude Code, Copilot, Cursor, JetBrains, Junie y Antigravity |
-| **Catálogo de versiones** | `gradle/libs.versions.toml` centralizado (Kotlin 2.4, AGP 9, Compose BOM 2026.06) |
+| **Catálogo de versiones** | `gradle/libs.versions.toml` centralizado (Kotlin 2.4, AGP 9, Compose BOM), mantenido al día por Dependabot |
 | **Calidad de código** | **ktlint + detekt + Android Lint** preconfigurados con tareas agregadas (`./gradlew formatAndAnalyze`) — reglas en `.editorconfig`, `config/detekt/detekt.yml` y `lint.xml` |
-| **CI/CD (GitHub Actions)** | `ci.yml` (calidad + build/tests en cada push/PR) y `release.yml` (APK/AAB + GitHub Release al pushear un tag `v*`) + Dependabot |
-| **Testing** | JUnit + Turbine + Fakes, con `MainDispatcherRule` y tests de ejemplo (UseCase + ViewModel) |
+| **Cobertura con gate** | **Kover** al 90% sobre `domain`/`data`/`ViewModels` (codegen y frontera de plataforma excluidos) |
+| **Reportes HTML** | `./gradlew qualityReports` genera los cuatro (Lint, detekt, ktlint y Kover) e imprime sus rutas `file://` |
+| **Análisis estático en la nube** | **SonarQube/SonarCloud opcional**, alimentado por los reportes de Lint/detekt/ktlint/Kover. Es opt-in: sin el secret `SONAR_TOKEN` el paso se salta y el CI queda verde |
+| **Screenshot testing** | **Roborazzi + Robolectric**: goldens versionados en `app/src/test/screenshots/`, con gate `verifyRoborazziDebug` |
+| **CI/CD (GitHub Actions)** | `ci.yml` (calidad → build/tests/gates/Sonar en cada push/PR) y `release.yml` (APK/AAB + GitHub Release al pushear un tag `v*`) + Dependabot. Actions **pineadas a SHA** y **Build Scan** publicado por run |
+| **Release endurecido** | **R8** activo (`optimization`), keep rules en `src/main/keepRules/`, `lint.abortOnError = true` |
+| **Testing** | JUnit + Turbine + Fakes escritos a mano, con `MainDispatcherRule` y tests de ejemplo (UseCase + Repository + ViewModel + golden). Todo en JVM: **sin `androidTest`** |
 
 ## 📋 Requisitos
 
@@ -86,13 +91,52 @@ El agente encontrará las reglas de arquitectura (Vertical Slice + Clean + MVI),
 # Compilar la app
 ./gradlew assembleDebug
 
-# Tests unitarios (JVM — sin emulador)
+# Tests unitarios + screenshots (JVM — sin emulador)
 ./gradlew test
 
 # Calidad de código (ktlint + detekt + Android Lint)
 ./gradlew formatAndAnalyze     # formatea y verifica todo
 ./gradlew codeQuality          # solo verifica (ideal para CI)
+
+# Reportes HTML navegables (imprime las rutas file:// al terminar)
+./gradlew qualityReports --continue
+
+# Gates
+./gradlew koverVerifyDebug        # cobertura (>=90% de domain/data/ViewModels)
+./gradlew verifyRoborazziDebug    # screenshots contra los goldens del repo
+./gradlew recordRoborazziDebug    # regenera goldens tras un cambio visual intencional
+./gradlew sonar                   # Sonar (requiere SONAR_TOKEN)
 ```
+
+> El CI encadena `test koverVerifyDebug verifyRoborazziDebug` en una sola invocación: los tests corren
+> **una vez** y los tres gates reutilizan esa corrida.
+
+### 📊 Reportes
+
+Cada herramienta emite dos formatos: uno HTML para leerlo y uno XML para que lo ingiera Sonar (u otra
+plataforma). Todos cuelgan de `app/build/reports/`.
+
+| Herramienta | HTML (para leer) | XML (para Sonar) |
+|-------------|------------------|------------------|
+| Android Lint | `lint-results-debug.html` | `lint-results-debug.xml` (+ `.sarif`) |
+| detekt | `detekt/detekt.html` | `detekt/detekt.xml` (+ `.sarif`, `.md`) |
+| ktlint | `ktlint/<sourceSet>/*.html` | `ktlint/<sourceSet>/*.xml` (Checkstyle) |
+| Kover | `kover/htmlDebug/index.html` | `kover/reportDebug.xml` (JaCoCo) |
+| Tests | `tests/testDebugUnitTest/index.html` | `build/test-results/testDebugUnitTest/*.xml` (JUnit) |
+| Roborazzi | `roborazzi/debug/index.html` | — |
+
+`qualityReports` corre las cuatro herramientas y lista las rutas. Usa `--continue` para que se
+generen los cuatro reportes aunque uno de los gates falle, que es justo cuando quieres leerlos.
+
+### SonarQube / SonarCloud (opcional)
+
+**El análisis es opt-in.** El paso del CI está guardado por `if: env.SONAR_TOKEN != ''`, así que un
+repo sin el secret —un fork, un PR externo, o este mismo scaffolding, que no tiene proyecto en Sonar—
+no intenta subir nada y el CI queda verde. No hay que desactivar nada.
+
+Para activarlo: impórtalo en [sonarcloud.io](https://sonarcloud.io), **desactiva Automatic Analysis**
+(choca con el scanner de Gradle) y añade el secret `SONAR_TOKEN`. Para una instancia self-hosted,
+define además la variable de repo `SONAR_HOST_URL`.
 
 ## 📄 Licencia
 

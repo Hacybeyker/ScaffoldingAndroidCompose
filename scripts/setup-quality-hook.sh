@@ -11,12 +11,16 @@ HOOK_FILE="$HOOK_DIR/pre-commit"
 cat > "$HOOK_FILE" <<'EOF'
 #!/bin/bash
 
+# Solo se re-stagean los archivos que YA formaban parte de este commit: `git add` sobre todo lo
+# modificado arrastraría al commit el trabajo en curso que la persona dejó fuera a propósito
+# (git add -p, un commit parcial).
+STAGED_KOTLIN=$(git diff --cached --name-only --diff-filter=ACM -- '*.kt' '*.kts')
+
 ./gradlew formatAndAnalyze --quiet
 FORMAT_EXIT=$?
 
-FORMATTED=$(git diff --name-only)
-if [ -n "$FORMATTED" ]; then
-    echo "$FORMATTED" | xargs git add
+if [ -n "$STAGED_KOTLIN" ]; then
+    echo "$STAGED_KOTLIN" | tr '\n' '\0' | xargs -0 git add --
     echo "ℹ️  formatAndAnalyze corrigió el formato — el commit incluye los archivos corregidos."
 fi
 
