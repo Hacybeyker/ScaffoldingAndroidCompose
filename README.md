@@ -13,12 +13,11 @@ Clona, ejecuta un script, y en menos de un minuto tienes un proyecto Android con
 | Componente | Descripción |
 |------------|-------------|
 | **Jetpack Compose + Material 3** | UI declarativa con design tokens (Color, Type, Shape, Spacing) |
-| **Arquitectura** | Vertical Slice (feature-first) + regla de dependencia Clean + MVI, con una feature de ejemplo completa |
+| **Arquitectura** | Clean Architecture + MVVM con UDF, organizada por features (perfil [`hb-stack-mobile-kotlin`](https://github.com/Hacybeyker/agent-skills)), con una feature de ejemplo completa |
 | **Hilt + Navigation 3** | DI por feature (`@Binds`) y navegación type-safe (`NavKey @Serializable`) |
 | **`init-project.sh`** | Script que renombra proyecto, package y applicationId en un solo paso |
-| **`AGENTS.md`** | Fuente de verdad para agentes de IA (estándar [agents.md](https://agents.md/)) |
-| **`.agents/`** | Skills de IA: android-best-practices, feature-implementation, code-reviewer, commits semánticos, changelog, creación de skills |
-| **Symlinks multi-IDE** | Las skills se sincronizan automáticamente para Claude Code, Copilot, Cursor, JetBrains, Junie y Antigravity |
+| **`AGENTS.md`** | Reglas del proyecto para agentes de IA (estándar [agents.md](https://agents.md/)); `CLAUDE.md` lo importa para Claude Code |
+| **Skills globales** | Las skills [hb-*](https://github.com/Hacybeyker/agent-skills) (implementar, revisar, commits, releases) se instalan una vez por máquina, no por proyecto |
 | **Catálogo de versiones** | `gradle/libs.versions.toml` centralizado (Kotlin 2.4, AGP 9, Compose BOM), mantenido al día por Dependabot |
 | **Calidad de código** | **ktlint + detekt + Android Lint** preconfigurados con tareas agregadas (`./gradlew formatAndAnalyze`) — reglas en `.editorconfig`, `config/detekt/detekt.yml` y `lint.xml` |
 | **Cobertura con gate** | **Kover** al 90% sobre `domain`/`data`/`ViewModels` (codegen y frontera de plataforma excluidos) |
@@ -57,11 +56,12 @@ El script te preguntará el **nombre del proyecto**, el **package base** y el **
 
 ## 🤖 Desarrollo con IA
 
-Una vez inicializado, abre tu agente de IA favorito en la raíz del proyecto y dile:
+1. Instala una vez las skills [hb-*](https://github.com/Hacybeyker/agent-skills) en tu máquina.
+2. Abre tu agente (Claude Code, Copilot, Gemini en Android Studio, Junie…) en la raíz del proyecto y pídele lo que necesites:
 
-> *"Lee AGENTS.md y ayúdame a implementar mi primera feature."*
+> *"Implementa la feature de perfil de usuario."*
 
-El agente encontrará las reglas de arquitectura (Vertical Slice + Clean + MVI), los estándares de código, la estrategia de testing y la guía de seguridad móvil en `.agents/skills/`. La skill `feature-implementation` define el workflow completo para **features, issues, bugs, enhancements, fixes y refactors** (contexto → snapshot → implementación → DoD → reporte HTML).
+`hb-implement` lee `AGENTS.md`, aplica el perfil `hb-stack-mobile-kotlin` y corre el DoD del proyecto; `hb-review` revisa, `hb-commit` prepara los commits y `hb-release` corta las versiones.
 
 ## 🏗️ Estructura del proyecto
 
@@ -75,10 +75,8 @@ El agente encontrará las reglas de arquitectura (Vertical Slice + Clean + MVI),
 │       ├── domain/        #   modelos + usecases + contrato del repo (Kotlin puro)
 │       ├── data/          #   repo impl in-memory + módulo Hilt (@Binds)
 │       └── ui/            #   Screen/Content + ViewModel MVI + UiState/Intents
-├── AGENTS.md              # Fuente de verdad para agentes de IA
-├── .agents/               # Skills e infraestructura de IA
-│   ├── skills/            # android-best-practices, feature-implementation, code-reviewer, git-commit…
-│   └── scripts/           # sync-skills.sh (symlinks multi-IDE)
+├── AGENTS.md              # Reglas del proyecto para agentes de IA
+├── CLAUDE.md              # Importa AGENTS.md para Claude Code
 ├── init-project.sh        # ⚡ Inicializador del scaffolding
 └── SETUP.md               # Guía detallada de inicialización
 ```

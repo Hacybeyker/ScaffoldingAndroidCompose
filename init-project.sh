@@ -306,7 +306,7 @@ if [[ -d ".idea" ]]; then
 fi
 
 # ── 5. Placeholders en la documentación de IA ────────────────────────────────
-echo "📝 Configurando documentación de IA (AGENTS.md y .agents/)..."
+echo "📝 Configurando AGENTS.md..."
 replace_placeholders() {
     local file=$1
     sedi "s|{{PROJECT_NAME}}|$PROJECT_NAME|g" "$file"
@@ -317,10 +317,7 @@ replace_placeholders() {
 }
 
 [[ -f "AGENTS.md" ]] && replace_placeholders "AGENTS.md"
-find .agents -type f \( -name "*.md" -o -name "*.sh" \) | while read -r file; do
-    replace_placeholders "$file"
-done
-echo "   ✅ Documentación actualizada."
+echo "   ✅ AGENTS.md actualizado."
 
 # ── 5b. Organización de SonarCloud ───────────────────────────────────────────
 # El projectKey y el projectName ya se renombraron con el package y el nombre del proyecto;
@@ -329,13 +326,10 @@ echo "🔎 Configurando SonarCloud (organización: $SONAR_ORG)..."
 sedi "s|{{SONAR_ORG}}|$SONAR_ORG|g" "build.gradle.kts"
 echo "   ✅ sonar.organization configurado."
 
-# ── 6. Symlinks de skills para los IDEs ──────────────────────────────────────
-echo "🔗 Sincronizando skills con los editores..."
-if [[ -f ".agents/scripts/sync-skills.sh" ]]; then
-    chmod +x .agents/scripts/sync-skills.sh
-    ./.agents/scripts/sync-skills.sh
-else
-    echo "⚠️  No se encontró .agents/scripts/sync-skills.sh — omitido."
+# ── 6. Skills de IA ──────────────────────────────────────────────────────────
+# Las skills son globales (https://github.com/Hacybeyker/agent-skills): el proyecto solo aporta AGENTS.md.
+if [[ ! -e "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/skills/hb-implement" && ! -e "$HOME/.agents/skills/hb-implement" ]]; then
+    echo "ℹ️  Las skills hb-* no están instaladas. Instálalas desde https://github.com/Hacybeyker/agent-skills"
 fi
 
 # ── 7. README del nuevo proyecto ─────────────────────────────────────────────
@@ -376,8 +370,7 @@ $GH_TODO
 │   ├── core/              # Compartido (design tokens en core/ui/theme/)
 │   ├── navigation/        # NavKeys + AppNavHost (Navigation 3)
 │   └── feature/<name>/    # Vertical Slices: domain / data / ui
-├── AGENTS.md              # Fuente de verdad para agentes de IA
-├── .agents/               # Skills e infraestructura de IA
+├── AGENTS.md              # Reglas del proyecto para agentes de IA (CLAUDE.md lo importa)
 └── gradle/
     └── libs.versions.toml # Catálogo centralizado de versiones
 \`\`\`
@@ -448,13 +441,11 @@ chmod +x scripts/setup-quality-hook.sh && ./scripts/setup-quality-hook.sh
 
 ## 🤖 Desarrollo con IA
 
-Este proyecto incluye infraestructura para agentes de IA (Claude Code, Copilot, Cursor, Junie, Antigravity…).
+Las reglas del proyecto están en \`AGENTS.md\` (Claude Code lo lee a través de \`CLAUDE.md\`). Con las skills [hb-*](https://github.com/Hacybeyker/agent-skills) instaladas, pídele a tu agente lo que necesites:
 
-Comienza diciéndole a tu agente:
+> *"Implementa la feature de perfil de usuario."*
 
-> *"Lee AGENTS.md y ayúdame a implementar mi primera feature."*
-
-El agente encontrará las reglas de arquitectura (Vertical Slice + Clean + MVI), el estándar de código y la guía de testing en \`.agents/skills/\`.
+El agente aplica Clean Architecture + MVVM (UDF) por features con el perfil \`hb-stack-mobile-kotlin\`, y corre el DoD de \`AGENTS.md\`.
 
 ---
 
@@ -594,7 +585,7 @@ echo "   4. SonarCloud: importa el repo, desactiva Automatic Analysis y añade e
 echo "      (Mientras no exista, el paso de Sonar se salta y el CI sigue verde.)"
 echo "   5. Al añadir tu primer screenshot test: ./gradlew recordRoborazziDebug y commitea los goldens."
 echo "   6. Nuevos colaboradores: ejecuta ./scripts/setup-quality-hook.sh una vez tras clonar."
-echo "   7. Dile a tu IA: 'Lee AGENTS.md y ayúdame a implementar mi primera feature'."
+echo "   7. Con las skills hb-* instaladas, pídele a tu IA: 'Implementa la feature X'."
 
 # Un placeholder que nadie ve es un placeholder que acaba publicado: se avisa aquí, no en un TODO.
 PENDING=""
@@ -602,6 +593,6 @@ PENDING=""
 [[ "$SONAR_ORG" == "TU_ORG_SONAR" ]] && PENDING+="\n   • build.gradle.kts: reemplaza sonar.organization = \"TU_ORG_SONAR\"."
 if [[ -n "$PENDING" ]]; then
     echo ""
-    echo "📝 Placeholders pendientes de rellenar:$(printf "$PENDING")"
+    echo "📝 Placeholders pendientes de rellenar:$(printf '%b' "$PENDING")"
 fi
 echo "------------------------------------------------------------"
