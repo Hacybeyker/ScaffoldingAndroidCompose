@@ -8,6 +8,15 @@
 ## [Unreleased]
 
 ### ✨ Added
+- Scaffolding inicial para proyectos Android nativos con Jetpack Compose:
+  - Arquitectura Vertical Slice + Clean + MVI con feature de ejemplo (`feature/home`) y tests (JUnit + Turbine + Fakes).
+  - Hilt (DI por feature) y Navigation 3 (NavKeys type-safe).
+  - Design tokens Material 3 (`core/ui/theme/`: Color, Type, Shape, Spacing).
+  - Calidad de código: ktlint + detekt + Android Lint con tareas `codeQuality` y `formatAndAnalyze`.
+  - Infraestructura de IA: `AGENTS.md` (estándar [agents.md](https://agents.md/)) y `CLAUDE.md`, que lo importa. Las skills son globales ([hb-*](https://github.com/Hacybeyker/agent-skills)) y no se copian al proyecto.
+  - `init-project.sh`: inicializador que renombra proyecto/package, limpia el ejemplo y configura git.
+  - CI/CD: GitHub Actions (`ci.yml`, `release.yml`) + Dependabot.
+  - Pre-commit hook de calidad (`scripts/setup-quality-hook.sh`).
 - **Flag `--github-user` (`-g`) en `init-project.sh`**, también pregunta en modo interactivo. Alimenta los badges del README, los links del CHANGELOG y, por defecto, `sonar.organization`. Antes solo se aceptaba como variable de entorno `GITHUB_USER`, sin equivalente en flags, así que era fácil terminar con badges apuntando a `TU_USUARIO`.
 - **Aviso de placeholders pendientes** al final del init: lista `TU_USUARIO` y `TU_ORG_SONAR` cuando quedan sin rellenar, en vez de dejarlos escondidos en un TODO del README.
 - **Tarea `qualityReports`**: genera el HTML de Android Lint, detekt, ktlint y Kover en una sola invocación e imprime las rutas `file://` al terminar. Con `--continue` los cuatro se producen aunque un gate falle.
@@ -20,7 +29,6 @@
 - **Screenshot testing con Roborazzi + Robolectric**: goldens versionados en `app/src/test/screenshots/`, con `verifyRoborazziDebug` como gate y un golden de ejemplo de `HomeContent` (light y dark).
 - Tests de ejemplo que faltaban para cubrir el slice completo: `ObserveGreetingUseCaseTest` e `InMemoryGreetingRepositoryTest`.
 - `build-scan-publish` en CI: cada run publica un Build Scan para diagnosticar fallos sin repetirlos.
-- Skill `code-reviewer`: revisión de código contra los estándares de `AGENTS.md` (arquitectura VSA + Clean + MVI, coding standards, testing, seguridad) con verificación automatizada del DoD y reporte por severidad.
 
 ### ♻️ Changed
 - **`targetSdk` 36 → 37**, a la par del `compileSdk`: por debajo, Android aplica modos de compatibilidad y Lint reporta `OldTargetApi`. Los tests JVM se fijan a la API 36 vía `robolectric.properties` porque Robolectric aún no trae la imagen de la 37.
@@ -42,14 +50,5 @@
 - `res/values/colors.xml`: los siete colores del template de Android Studio no los usaba nadie (el tema Compose vive en `core/ui/theme/Color.kt`) y generaban siete warnings de `UnusedResources` en cada build.
 - `android:label` redundante en la `<activity>` del manifest, que ya heredaba el de `<application>`.
 - Source set `androidTest` y la dependencia de Espresso: toda la verificación automatizada corre en la JVM (unitarios + Robolectric/Roborazzi) y lo que depende de hardware se prueba a mano en un dispositivo.
-- Scaffolding inicial para proyectos Android nativos con Jetpack Compose:
-  - Arquitectura Vertical Slice + Clean + MVI con feature de ejemplo (`feature/home`) y tests (JUnit + Turbine + Fakes).
-  - Hilt (DI por feature) y Navigation 3 (NavKeys type-safe).
-  - Design tokens Material 3 (`core/ui/theme/`: Color, Type, Shape, Spacing).
-  - Calidad de código: ktlint + detekt + Android Lint con tareas `codeQuality` y `formatAndAnalyze`.
-  - Infraestructura de IA: `AGENTS.md` + `.agents/` (skills `android-best-practices`, `feature-implementation`, `git-commit`, `changelog-generator`, `skill-creator`, `skill-linker`) con symlinks multi-IDE.
-  - `init-project.sh`: inicializador que renombra proyecto/package, limpia el ejemplo y configura git.
-  - CI/CD: GitHub Actions (`ci.yml`, `release.yml`) + Dependabot.
-  - Pre-commit hook de calidad (`scripts/setup-quality-hook.sh`).
 
 [Unreleased]: https://github.com/hacybeyker/ScaffoldingAndroidCompose/commits/main

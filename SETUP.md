@@ -96,8 +96,7 @@ Si omites `--github-user` y `--sonar-org`, el script deja los placeholders `TU_U
 | **Screenshots** | `app/src/test/screenshots/` | Goldens del ejemplo eliminados (se regeneran con `recordRoborazziDebug`) |
 | **Cobertura** | `app/build.gradle.kts` | Patrones de clases de Kover (`<package>.*.domain.*`, `.data.*`, `*ViewModel*`) |
 | **SonarCloud** | `build.gradle.kts` | `projectKey` (del package), `projectName` (del nombre) y `{{SONAR_ORG}}` (de `--sonar-org` o `--github-user`) |
-| **Docs IA** | `AGENTS.md`, `.agents/**` | Placeholders `{{PROJECT_NAME}}`, `{{PACKAGE_NAME}}`, `{{MODULE_NAME}}`, `{{PACKAGE_PATH}}`, `{{PROJECT_ROOT}}` |
-| **IDE/IA** | `.claude/`, `.cursor/`, `.github/copilot/`, `.jetbrains/`, `.junie/`, `.antigravity/`, `.agent/` | Symlinks hacia `.agents/skills/` (vía `sync-skills.sh`) |
+| **Docs IA** | `AGENTS.md` | Placeholders `{{PROJECT_NAME}}`, `{{PACKAGE_NAME}}`, `{{MODULE_NAME}}`, `{{PACKAGE_PATH}}`, `{{PROJECT_ROOT}}` |
 | **IntelliJ/Android Studio** | `.idea/*.iml`, `.idea/modules.xml`, `.idea/.name` | Renombrados con el nuevo nombre del proyecto |
 | **Carpeta raíz** | El directorio del proyecto | Renombrado automáticamente si no coincide con `--name` |
 | **Git** | Historial local + remoto | Squash (Opción A) o commit-on-top (Opción B) — sin `--force` |
@@ -137,16 +136,16 @@ grep -ri "scaffoldingandroidcompose\|com.hacybeyker" --exclude-dir=.git --exclud
 
 ## 6. Empezar a desarrollar con IA
 
-Abre tu agente de IA (Claude Code, Copilot, Cursor, Junie…) en la raíz del proyecto y dile:
+Instala una vez las skills [hb-*](https://github.com/Hacybeyker/agent-skills), abre tu agente (Claude Code, Copilot, Gemini en Android Studio, Junie…) en la raíz del proyecto y pídele lo que necesites:
 
-> *"Lee AGENTS.md y ayúdame a implementar mi primera feature."*
+> *"Implementa la feature de perfil de usuario."*
 
 El agente seguirá automáticamente:
 
-- **Arquitectura**: Vertical Slice + Clean + MVI (`.agents/skills/android-best-practices/`).
-- **Workflow**: features/bugs/fixes de punta a punta con DoD y reporte (`.agents/skills/feature-implementation/`).
-- **Commits**: mensajes semánticos con `/commit` (`.agents/skills/git-commit/`).
-- **Changelog**: notas de versión con `/changelog`.
+- **Arquitectura**: Clean Architecture + MVVM (UDF) por features, con el perfil `hb-stack-mobile-kotlin`.
+- **Workflow**: features, bugs y refactors de punta a punta con DoD y reporte (`hb-implement`).
+- **Revisión**: code review contra `AGENTS.md` y el perfil (`hb-review`).
+- **Commits y releases**: Conventional Commits (`hb-commit`) y SemVer + changelog (`hb-release`).
 - **Reglas duras**: sin lógica en Composables, sin Entities/DTOs fuera de data, sin secretos hardcodeados.
 
 ## 7. Pasos manuales opcionales
