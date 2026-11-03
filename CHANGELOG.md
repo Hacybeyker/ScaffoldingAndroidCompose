@@ -7,7 +7,7 @@
 
 ## [Unreleased]
 
-### ✨ Added
+### Added
 - Scaffolding inicial para proyectos Android nativos con Jetpack Compose:
   - Clean Architecture + MVVM con UDF por features (perfil `hb-stack-mobile-kotlin`), con feature de ejemplo (`feature/home`) y tests (JUnit + Turbine + Fakes).
   - Hilt (DI por feature) y Navigation 3 (NavKeys type-safe).
@@ -30,7 +30,8 @@
 - Tests de ejemplo que faltaban para cubrir el slice completo: `ObserveGreetingUseCaseTest` e `InMemoryGreetingRepositoryTest`.
 - `build-scan-publish` en CI: cada run publica un Build Scan para diagnosticar fallos sin repetirlos.
 
-### ♻️ Changed
+### Changed
+- **Encabezados estándar de Keep a Changelog** (`Added`, `Changed`, `Removed`, `Fixed`, sin emoji y en ese orden), también en el CHANGELOG que genera `init-project.sh`: es el formato que escriben las skills `hb-*`.
 - **Estructura alineada con el perfil `hb-stack-mobile-kotlin`** sin cambiar el comportamiento ni el aspecto de la app: tokens en `core/designsystem/`; `feature/home` con `domain/model`, `domain/repository`, `data/repository` y el módulo Hilt en `di/HomeModule`; contrato de presentación `HomeUiState` + `HomeAction` con un único `onAction`; `HomeContent` sin estado en su propio archivo; cada feature declara su NavKey en `ui/<Feature>NavKey.kt` y su entry builder en `ui/<Feature>Navigation.kt`, y `navigation/AppNavDisplay.kt` solo arma el back stack; `MainDispatcherRule` en `core/testing`.
 - **`targetSdk` 36 → 37**, a la par del `compileSdk`: por debajo, Android aplica modos de compatibilidad y Lint reporta `OldTargetApi`. Los tests JVM corren en la misma API 37, fijada en `robolectric.properties`.
 - **Dependencias al día:** AGP 9.4.0 → 9.5.0, Gradle 9.7.1 → 9.8.2 (wrapper regenerado con `./gradlew wrapper` y con `distributionSha256Sum`, que verifica la distribución descargada), Kotlin 2.4.10 → 2.4.21, KSP 2.3.11 → 2.3.13, Compose BOM 2026.08.00 → 2026.09.00, Navigation 3 1.1.7 → 1.2.0, kotlinx.serialization 1.11.0 → 1.12.0, core-ktx 1.19.0 → 1.19.1, Robolectric 4.16.1 → 4.17, Roborazzi 1.73.0 → 1.77.0 y Kover 0.9.9 → 0.9.11.
@@ -51,7 +52,7 @@
 - `AGENTS.md`: reglas duras nuevas (no ejecutar en emulador/dispositivo, no commitear por cuenta propia, no bajar un gate para que pase el build, naming sin sufijo `Impl`).
 - `compose_stability.conf` marca `androidx.lifecycle.ViewModel` como estable para mejorar la *skippability* de los composables.
 
-### 🗑️ Removed
+### Removed
 - `res/values/colors.xml`: los siete colores del template de Android Studio no los usaba nadie (el tema Compose vive en `core/designsystem/Color.kt`) y generaban siete warnings de `UnusedResources` en cada build.
 - `android:label` redundante en la `<activity>` del manifest, que ya heredaba el de `<application>`.
 - Source set `androidTest` y sus tests de Espresso (`espresso-core` vuelve solo como dependencia interna de los tests JVM; ver Changed): toda la verificación automatizada corre en la JVM (unitarios + Robolectric/Roborazzi) y lo que depende de hardware se prueba a mano en un dispositivo.
