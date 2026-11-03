@@ -43,6 +43,20 @@ android {
             isIncludeAndroidResources = true
             all { test ->
                 test.maxHeapSize = "2g"
+                // Robolectric 4.17+ en JDK 17+ necesita abrir paquetes internos del JDK
+                // (https://robolectric.org/getting-started/). Sin jdk.internal.access, el arranque del
+                // entorno de SDK 36+ falla en ApplicationSharedMemory.create().
+                test.jvmArgs(
+                    "--add-opens=java.base/java.lang=ALL-UNNAMED",
+                    "--add-opens=java.base/java.util=ALL-UNNAMED",
+                    "--add-opens=java.base/java.io=ALL-UNNAMED",
+                    "--add-opens=java.base/java.net=ALL-UNNAMED",
+                    "--add-opens=java.base/java.security=ALL-UNNAMED",
+                    "--add-opens=java.base/java.text=ALL-UNNAMED",
+                    "--add-opens=java.base/jdk.internal.access=ALL-UNNAMED",
+                    "--add-opens=java.desktop/java.awt.font=ALL-UNNAMED",
+                    "--add-opens=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED"
+                )
             }
         }
     }
@@ -87,6 +101,9 @@ dependencies {
     testImplementation(libs.turbine)
     testImplementation(platform(libs.androidx.compose.bom))
     testImplementation(libs.androidx.compose.ui.test.junit4)
+    // No es para escribir tests de Espresso: compose-ui-test lo usa por dentro con Robolectric, y la
+    // 3.5.1 que trae transitiva falla en la API 37 (llama a InputManager.getInstance(), que ya no existe).
+    testImplementation(libs.androidx.espresso.core)
     testImplementation(libs.androidx.junit)
     testImplementation(libs.robolectric)
     testImplementation(libs.roborazzi)
