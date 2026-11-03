@@ -1,4 +1,4 @@
-package com.hacybeyker.scaffoldingandroidcompose.core.ui.theme
+package com.hacybeyker.scaffoldingandroidcompose.core.designsystem
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable

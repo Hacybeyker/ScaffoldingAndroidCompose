@@ -1,4 +1,4 @@
-package com.hacybeyker.scaffoldingandroidcompose.core.ui.theme
+package com.hacybeyker.scaffoldingandroidcompose.core.designsystem
 
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme

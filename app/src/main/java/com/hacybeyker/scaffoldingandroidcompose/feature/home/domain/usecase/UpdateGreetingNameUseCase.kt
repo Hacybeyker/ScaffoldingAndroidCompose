@@ -1,6 +1,6 @@
 package com.hacybeyker.scaffoldingandroidcompose.feature.home.domain.usecase
 
-import com.hacybeyker.scaffoldingandroidcompose.feature.home.domain.GreetingRepository
+import com.hacybeyker.scaffoldingandroidcompose.feature.home.domain.repository.GreetingRepository
 import javax.inject.Inject
 
 /**

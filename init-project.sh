@@ -191,15 +191,18 @@ find . -type d -path "*/java/$OLD_TOP_SEGMENT" -not -path "./.git/*" -not -path 
     -exec find {} -depth -type d -empty -delete \; 2>/dev/null || true
 
 # ── 4.5. Limpiar la feature de ejemplo (home/greeting) ───────────────────────
-# La feature "home" del scaffolding demuestra la arquitectura (domain/data/ui).
-# Se reemplaza por una pantalla mínima para que el proyecto arranque limpio.
+# La feature "home" del scaffolding demuestra la arquitectura (domain/data/ui/di).
+# Se reemplaza por una pantalla mínima para que el proyecto arranque limpio. HomeNavKey.kt y
+# HomeNavigation.kt se conservan: homeEntry() llama al HomeScreen() mínimo y AppNavDisplay compila igual.
 echo "🗑️  Eliminando código de ejemplo del scaffolding..."
 MAIN_SRC="app/src/main/java/$NEW_PACKAGE_PATH"
 TEST_SRC="app/src/test/java/$NEW_PACKAGE_PATH"
 
-rm -rf "$MAIN_SRC/feature/home/domain" "$MAIN_SRC/feature/home/data"
+rm -rf "$MAIN_SRC/feature/home/domain" "$MAIN_SRC/feature/home/data" "$MAIN_SRC/feature/home/di"
 rm -f "$MAIN_SRC/feature/home/ui/HomeUiState.kt" \
-      "$MAIN_SRC/feature/home/ui/HomeViewModel.kt"
+      "$MAIN_SRC/feature/home/ui/HomeViewModel.kt" \
+      "$MAIN_SRC/feature/home/ui/HomeContent.kt" \
+      "$MAIN_SRC/feature/home/ui/HomeAction.kt"
 rm -rf "$TEST_SRC/feature"
 # Los goldens del ejemplo no sirven en el proyecto nuevo: se regeneran con recordRoborazziDebug
 # cuando el proyecto tenga sus propios screenshot tests.
@@ -218,7 +221,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import $PACKAGE_NAME.R
-import $PACKAGE_NAME.core.ui.theme.${PROJECT_NAME}Theme
+import $PACKAGE_NAME.core.designsystem.${PROJECT_NAME}Theme
 
 @Composable
 fun HomeScreen(modifier: Modifier = Modifier) {
@@ -367,9 +370,9 @@ $GH_TODO
 \`\`\`
 .
 ├── app/src/main/java/$NEW_PACKAGE_PATH/
-│   ├── core/              # Compartido (design tokens en core/ui/theme/)
-│   ├── navigation/        # NavKeys + AppNavHost (Navigation 3)
-│   └── feature/<name>/    # Vertical Slices: domain / data / ui
+│   ├── core/              # Compartido (design tokens en core/designsystem/)
+│   ├── navigation/        # AppNavDisplay (Navigation 3)
+│   └── feature/<name>/    # Por features: domain / data / ui / di
 ├── AGENTS.md              # Reglas del proyecto para agentes de IA (CLAUDE.md lo importa)
 └── gradle/
     └── libs.versions.toml # Catálogo centralizado de versiones
@@ -478,7 +481,7 @@ cat > CHANGELOG.md <<EOF
 ## [1.0.0] — $INIT_DATE
 
 ### ✨ Added
-- Feature X implementada como Vertical Slice (domain → data → ui)
+- Feature X implementada por capas dentro de la feature (domain → data → ui)
 
 ### 🔧 Fixed
 - Bug Y corregido en la feature Z

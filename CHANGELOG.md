@@ -9,9 +9,9 @@
 
 ### ✨ Added
 - Scaffolding inicial para proyectos Android nativos con Jetpack Compose:
-  - Arquitectura Vertical Slice + Clean + MVI con feature de ejemplo (`feature/home`) y tests (JUnit + Turbine + Fakes).
+  - Clean Architecture + MVVM con UDF por features (perfil `hb-stack-mobile-kotlin`), con feature de ejemplo (`feature/home`) y tests (JUnit + Turbine + Fakes).
   - Hilt (DI por feature) y Navigation 3 (NavKeys type-safe).
-  - Design tokens Material 3 (`core/ui/theme/`: Color, Type, Shape, Spacing).
+  - Design tokens Material 3 (`core/designsystem/`: Color, Type, Shape, Spacing).
   - Calidad de código: ktlint + detekt + Android Lint con tareas `codeQuality` y `formatAndAnalyze`.
   - Infraestructura de IA: `AGENTS.md` (estándar [agents.md](https://agents.md/)) y `CLAUDE.md`, que lo importa. Las skills son globales ([hb-*](https://github.com/Hacybeyker/agent-skills)) y no se copian al proyecto.
   - `init-project.sh`: inicializador que renombra proyecto/package, limpia el ejemplo y configura git.
@@ -31,6 +31,7 @@
 - `build-scan-publish` en CI: cada run publica un Build Scan para diagnosticar fallos sin repetirlos.
 
 ### ♻️ Changed
+- **Estructura alineada con el perfil `hb-stack-mobile-kotlin`** sin cambiar el comportamiento ni el aspecto de la app: tokens en `core/designsystem/`; `feature/home` con `domain/model`, `domain/repository`, `data/repository` y el módulo Hilt en `di/HomeModule`; contrato de presentación `HomeUiState` + `HomeAction` con un único `onAction`; `HomeContent` sin estado en su propio archivo; cada feature declara su NavKey en `ui/<Feature>NavKey.kt` y su entry builder en `ui/<Feature>Navigation.kt`, y `navigation/AppNavDisplay.kt` solo arma el back stack; `MainDispatcherRule` en `core/testing`.
 - **`targetSdk` 36 → 37**, a la par del `compileSdk`: por debajo, Android aplica modos de compatibilidad y Lint reporta `OldTargetApi`. Los tests JVM se fijan a la API 36 vía `robolectric.properties` porque Robolectric aún no trae la imagen de la 37.
 - **`init-project.sh` reordena los imports** de todos los `.kt` tras el rename de package. El rename es un `sed` en sitio, así que el import del proyecto se quedaba en la posición del scaffolding: con un package como `ai.startup.nova` —que ordena antes de `androidx`— el primer `./gradlew codeQuality` del proyecto nuevo fallaba con `standard:import-ordering`.
 - **Badges del README generado** derivados de `libs.versions.toml` y del build en vez de hardcodeados (ya anunciaban Kotlin 2.4.0 y Compose BOM 2026.06 con el catálogo en 2.4.10 y 2026.08.00).
@@ -47,7 +48,7 @@
 - `compose_stability.conf` marca `androidx.lifecycle.ViewModel` como estable para mejorar la *skippability* de los composables.
 
 ### 🗑️ Removed
-- `res/values/colors.xml`: los siete colores del template de Android Studio no los usaba nadie (el tema Compose vive en `core/ui/theme/Color.kt`) y generaban siete warnings de `UnusedResources` en cada build.
+- `res/values/colors.xml`: los siete colores del template de Android Studio no los usaba nadie (el tema Compose vive en `core/designsystem/Color.kt`) y generaban siete warnings de `UnusedResources` en cada build.
 - `android:label` redundante en la `<activity>` del manifest, que ya heredaba el de `<application>`.
 - Source set `androidTest` y la dependencia de Espresso: toda la verificación automatizada corre en la JVM (unitarios + Robolectric/Roborazzi) y lo que depende de hardware se prueba a mano en un dispositivo.
 

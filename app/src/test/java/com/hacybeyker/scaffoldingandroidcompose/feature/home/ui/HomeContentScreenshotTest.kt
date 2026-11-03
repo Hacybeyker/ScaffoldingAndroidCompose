@@ -4,8 +4,8 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onRoot
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.takahirom.roborazzi.captureRoboImage
-import com.hacybeyker.scaffoldingandroidcompose.core.ui.theme.ScaffoldingAndroidComposeTheme
-import com.hacybeyker.scaffoldingandroidcompose.feature.home.domain.Greeting
+import com.hacybeyker.scaffoldingandroidcompose.core.designsystem.ScaffoldingAndroidComposeTheme
+import com.hacybeyker.scaffoldingandroidcompose.feature.home.domain.model.Greeting
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -35,7 +35,7 @@ class HomeContentScreenshotTest {
             ScaffoldingAndroidComposeTheme(darkTheme = darkTheme, dynamicColor = false) {
                 HomeContent(
                     uiState = HomeUiState.Content(greeting = Greeting(name = "Android")),
-                    onIntent = {}
+                    onAction = {}
                 )
             }
         }

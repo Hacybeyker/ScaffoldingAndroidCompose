@@ -1,7 +1,7 @@
 package com.hacybeyker.scaffoldingandroidcompose.feature.home
 
-import com.hacybeyker.scaffoldingandroidcompose.feature.home.domain.Greeting
-import com.hacybeyker.scaffoldingandroidcompose.feature.home.domain.GreetingRepository
+import com.hacybeyker.scaffoldingandroidcompose.feature.home.domain.model.Greeting
+import com.hacybeyker.scaffoldingandroidcompose.feature.home.domain.repository.GreetingRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map

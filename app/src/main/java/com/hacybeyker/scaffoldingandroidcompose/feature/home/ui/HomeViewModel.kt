@@ -3,7 +3,7 @@ package com.hacybeyker.scaffoldingandroidcompose.feature.home.ui
 import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.hacybeyker.scaffoldingandroidcompose.feature.home.domain.Greeting
+import com.hacybeyker.scaffoldingandroidcompose.feature.home.domain.model.Greeting
 import com.hacybeyker.scaffoldingandroidcompose.feature.home.domain.usecase.ObserveGreetingUseCase
 import com.hacybeyker.scaffoldingandroidcompose.feature.home.domain.usecase.UpdateGreetingNameUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -29,9 +29,9 @@ class HomeViewModel @Inject constructor(
             initialValue = HomeUiState.Loading
         )
 
-    fun onIntent(intent: HomeIntent) {
-        when (intent) {
-            is HomeIntent.SubmitName -> viewModelScope.launch { updateGreetingName(intent.name) }
+    fun onAction(action: HomeAction) {
+        when (action) {
+            is HomeAction.SubmitName -> viewModelScope.launch { updateGreetingName(action.name) }
         }
     }
 

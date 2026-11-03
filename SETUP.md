@@ -46,7 +46,7 @@ Al final pregunta por **una limpieza opcional** (recomendada):
 
 Y aplica **automáticamente** estas tareas (no necesitas hacer nada):
 
-- 🗑️ **Limpia la feature de ejemplo** (`feature/home` con su domain/data/tests) y la reemplaza por una pantalla mínima.
+- 🗑️ **Limpia la feature de ejemplo** (`feature/home`: `domain/`, `data/`, `di/`, ViewModel + UiState/Action, `HomeContent` y sus tests) y la reemplaza por un `HomeScreen` mínimo. `HomeNavKey.kt` y `HomeNavigation.kt` se conservan, así que `AppNavDisplay` sigue compilando.
 - 📂 **Renombra la carpeta raíz** si no coincide con el nombre del proyecto.
 - 🧠 **Limpia metadatos del IDE** (`.idea/*.iml`, `.idea/modules.xml`, `.idea/.name`).
 - 🌱 **Historial de git inteligente**:
@@ -90,9 +90,9 @@ Si omites `--github-user` y `--sonar-org`, el script deja los placeholders `TU_U
 | **Android** | `app/build.gradle.kts` | `namespace` y `applicationId` |
 | **Android** | `app/src/main/res/values/strings.xml` | `app_name` (nombre visible) |
 | **Android** | `app/src/main/res/values/themes.xml` | Nombre del theme XML |
-| **Kotlin** | `app/src/**` | Declaraciones `package`/`import`, nombre del theme Compose y **carpetas movidas** al nuevo package |
+| **Kotlin** | `app/src/**` | Declaraciones `package`/`import`, nombre del theme Compose (`core/designsystem/Theme.kt`) y **carpetas movidas** al nuevo package |
 | **Kotlin** | `app/src/**/*.kt` | Imports **reordenados** (el package nuevo puede caer antes o después de `androidx`; ktlint los exige lexicográficos) |
-| **Ejemplo** | `feature/home/**` (main + test) | Slice de ejemplo eliminado; `HomeScreen` mínimo restaurado |
+| **Ejemplo** | `feature/home/**` (main + test) | Feature de ejemplo eliminada (`domain/`, `data/`, `di/`, ViewModel + UiState/Action); quedan un `HomeScreen` mínimo, `HomeNavKey.kt` y `HomeNavigation.kt` |
 | **Screenshots** | `app/src/test/screenshots/` | Goldens del ejemplo eliminados (se regeneran con `recordRoborazziDebug`) |
 | **Cobertura** | `app/build.gradle.kts` | Patrones de clases de Kover (`<package>.*.domain.*`, `.data.*`, `*ViewModel*`) |
 | **SonarCloud** | `build.gradle.kts` | `projectKey` (del package), `projectName` (del nombre) y `{{SONAR_ORG}}` (de `--sonar-org` o `--github-user`) |
@@ -142,7 +142,7 @@ Instala una vez las skills [hb-*](https://github.com/Hacybeyker/agent-skills), a
 
 El agente seguirá automáticamente:
 
-- **Arquitectura**: Clean Architecture + MVVM (UDF) por features, con el perfil `hb-stack-mobile-kotlin`.
+- **Arquitectura**: Clean Architecture + MVVM (UDF) por features, con el perfil `hb-stack-mobile-kotlin`. Cada feature tiene `domain/`, `data/`, `ui/` (ViewModel + UiState/Action, su NavKey en `<Feature>NavKey.kt` y su entry builder en `<Feature>Navigation.kt`) y `di/`; los design tokens están en `core/designsystem/` y `navigation/AppNavDisplay.kt` solo arma el back stack.
 - **Workflow**: features, bugs y refactors de punta a punta con DoD y reporte (`hb-implement`).
 - **Revisión**: code review contra `AGENTS.md` y el perfil (`hb-review`).
 - **Commits y releases**: Conventional Commits (`hb-commit`) y SemVer + changelog (`hb-release`).

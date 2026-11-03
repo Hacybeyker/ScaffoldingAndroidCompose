@@ -35,7 +35,8 @@ Antes de dar una tarea por terminada, en este orden:
 
 Sigue el perfil (Clean Architecture + MVVM con UDF, por features). Particularidades de este proyecto:
 
-- Un solo módulo, `{{MODULE_NAME}}`, con los paquetes `core/`, `navigation/` y `feature/<nombre>/`. Los design tokens están en `core/ui/theme/`.
+- Un solo módulo, `{{MODULE_NAME}}`, con los paquetes `core/`, `navigation/` y `feature/<nombre>/`. Los design tokens están en `core/designsystem/`.
+- Cada feature declara su NavKey en `ui/<Feature>NavKey.kt` y su entry builder en `ui/<Feature>Navigation.kt`; `navigation/AppNavDisplay.kt` solo arma el back stack y junta los entry builders.
 - `feature/home` es el ejemplo de referencia de una feature completa.
 - **Sin tests instrumentados:** no existe `androidTest`. El código que depende de hardware (cámara, GPS, biometría, sensores) se verifica a mano en un dispositivo y se excluye del gate de cobertura.
 - Los goldens de Roborazzi se versionan en `app/src/test/screenshots/`.
