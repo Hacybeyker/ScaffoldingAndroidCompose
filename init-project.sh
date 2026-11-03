@@ -471,7 +471,7 @@ cat > CHANGELOG.md <<EOF
 
 ## [Unreleased]
 
-### ✨ Added
+### Added
 - Proyecto inicializado a partir de [ScaffoldingAndroidCompose](https://github.com/hacybeyker/ScaffoldingAndroidCompose)
 
 ---
@@ -480,17 +480,17 @@ cat > CHANGELOG.md <<EOF
 
 ## [1.0.0] — $INIT_DATE
 
-### ✨ Added
+### Added
 - Feature X implementada por capas dentro de la feature (domain → data → ui)
 
-### 🔧 Fixed
-- Bug Y corregido en la feature Z
-
-### ♻️ Changed
+### Changed
 - Refactor de Z para mejorar legibilidad
 
-### 🗑️ Removed
+### Removed
 - Eliminado código obsoleto de A
+
+### Fixed
+- Bug Y corregido en la feature Z
 
 -->
 
