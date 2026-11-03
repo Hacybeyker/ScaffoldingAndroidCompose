@@ -1,4 +1,4 @@
-package com.hacybeyker.scaffoldingandroidcompose.core.test
+package com.hacybeyker.scaffoldingandroidcompose.core.testing
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi

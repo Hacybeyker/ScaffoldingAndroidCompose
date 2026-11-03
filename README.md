@@ -69,12 +69,13 @@ El script te preguntará el **nombre del proyecto**, el **package base** y el **
 .
 ├── app/src/main/java/<package>/
 │   ├── core/              # Compartido SOLO si ≥2 features lo necesitan
-│   │   └── ui/theme/      # Design tokens (Color, Type, Shape, Spacing, Theme)
-│   ├── navigation/        # NavKeys @Serializable + AppNavHost (Navigation 3)
-│   └── feature/home/      # Feature de EJEMPLO (Vertical Slice completo)
-│       ├── domain/        #   modelos + usecases + contrato del repo (Kotlin puro)
-│       ├── data/          #   repo impl in-memory + módulo Hilt (@Binds)
-│       └── ui/            #   Screen/Content + ViewModel MVI + UiState/Intents
+│   │   └── designsystem/  # Design tokens (Color, Type, Shape, Spacing, Theme)
+│   ├── navigation/        # AppNavDisplay (Navigation 3): arma el back stack con las entries de cada feature
+│   └── feature/home/      # Feature de EJEMPLO, completa
+│       ├── domain/        #   model/ + repository/ (contrato) + usecase/ (Kotlin puro)
+│       ├── data/          #   repository/: InMemoryGreetingRepository
+│       ├── ui/            #   Screen/Content + ViewModel + UiState/Action + NavKey + Navigation (entry builder)
+│       └── di/            #   HomeModule (Hilt, @Binds)
 ├── AGENTS.md              # Reglas del proyecto para agentes de IA
 ├── CLAUDE.md              # Importa AGENTS.md para Claude Code
 ├── init-project.sh        # ⚡ Inicializador del scaffolding

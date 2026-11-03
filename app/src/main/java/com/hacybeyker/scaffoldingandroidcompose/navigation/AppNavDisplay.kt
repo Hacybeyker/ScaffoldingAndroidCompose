@@ -7,11 +7,12 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
-import com.hacybeyker.scaffoldingandroidcompose.feature.home.ui.HomeScreen
+import com.hacybeyker.scaffoldingandroidcompose.feature.home.ui.HomeNavKey
+import com.hacybeyker.scaffoldingandroidcompose.feature.home.ui.homeEntry
 
 @Composable
-fun AppNavHost(modifier: Modifier = Modifier) {
-    val backStack = rememberNavBackStack(Home)
+fun AppNavDisplay(modifier: Modifier = Modifier) {
+    val backStack = rememberNavBackStack(HomeNavKey)
     NavDisplay(
         backStack = backStack,
         modifier = modifier,
@@ -21,7 +22,7 @@ fun AppNavHost(modifier: Modifier = Modifier) {
             rememberViewModelStoreNavEntryDecorator()
         ),
         entryProvider = entryProvider {
-            entry<Home> { HomeScreen() }
+            homeEntry()
         }
     )
 }

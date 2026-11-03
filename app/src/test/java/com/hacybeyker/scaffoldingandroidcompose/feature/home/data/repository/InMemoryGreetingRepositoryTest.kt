@@ -1,4 +1,4 @@
-package com.hacybeyker.scaffoldingandroidcompose.feature.home.data
+package com.hacybeyker.scaffoldingandroidcompose.feature.home.data.repository
 
 import app.cash.turbine.test
 import kotlinx.coroutines.test.runTest
