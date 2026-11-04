@@ -50,8 +50,24 @@ sedi() {
 }
 
 usage() {
-    sed -n '2,29p' "$0" | sed 's/^# \{0,1\}//'
+    # Imprime el bloque de comentarios del encabezado completo, sin depender de números de línea.
+    awk 'NR == 1 { next } /^#/ { sub(/^# ?/, ""); print; next } { exit }' "$0"
     exit 0
+}
+
+# Escapa un texto para usarlo como reemplazo de sed con | como separador (\, | y &).
+sed_replacement() {
+    printf '%s' "$1" | sed -e 's/[\\|&]/\\&/g'
+}
+
+# Escapa un texto para un <string> de recursos de Android: XML (&, <, >) y las reglas de aapt2
+# (\, ' y ", y @ o ? al inicio, que aapt2 tomaría como referencia a otro recurso).
+android_string() {
+    local s
+    s=$(printf '%s' "$1" | sed -e 's/\\/\\\\/g' -e 's/&/\&amp;/g' -e 's/</\&lt;/g' -e 's/>/\&gt;/g' \
+        -e "s/'/\\\\'/g" -e 's/"/\\"/g')
+    case "$s" in [@?]*) s="\\$s" ;; esac
+    printf '%s' "$s"
 }
 
 die() {
@@ -117,6 +133,10 @@ GH_USER=${GH_USER:-TU_USUARIO}
 [[ "$PACKAGE_NAME" =~ ^[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)+$ ]] \
     || die "Package inválido: '$PACKAGE_NAME'. Usa minúsculas separadas por puntos (ej. com.empresa.miapp)."
 
+# Reglas de GitHub: letras, números y guiones simples, sin guion al inicio ni al final, hasta 39.
+[[ "$GH_USER" == "TU_USUARIO" || ( "$GH_USER" =~ ^[A-Za-z0-9](-?[A-Za-z0-9])*$ && ${#GH_USER} -le 39 ) ]] \
+    || die "Usuario de GitHub inválido: '$GH_USER'. Usa letras, números y guiones simples (ej. mi-empresa)."
+
 [[ "$PACKAGE_NAME" != "$OLD_PACKAGE_NAME" ]] \
     || die "El package no puede ser el mismo del scaffolding ($OLD_PACKAGE_NAME)."
 
@@ -163,7 +183,7 @@ replace_in_repo() {
 }
 
 echo "🏷️  Configurando nombre visible de la app (strings.xml)..."
-sedi "s|<string name=\"app_name\">.*</string>|<string name=\"app_name\">$APP_NAME</string>|" \
+sedi "s|<string name=\"app_name\">.*</string>|<string name=\"app_name\">$(sed_replacement "$(android_string "$APP_NAME")")</string>|" \
     "app/src/main/res/values/strings.xml"
 
 echo "📦 Renombrando package: $OLD_PACKAGE_NAME → $PACKAGE_NAME"
@@ -245,7 +265,7 @@ HOMEEOF
 # Deja solo app_name en strings.xml (los strings del ejemplo ya no existen)
 cat > "app/src/main/res/values/strings.xml" <<STREOF
 <resources>
-    <string name="app_name">$APP_NAME</string>
+    <string name="app_name">$(android_string "$APP_NAME")</string>
 </resources>
 STREOF
 echo "   ✅ Feature de ejemplo eliminada; HomeScreen mínimo restaurado."
@@ -598,7 +618,7 @@ echo "   7. Con las skills hb-* instaladas, pídele a tu IA: 'Implementa la feat
 
 # Un placeholder que nadie ve es un placeholder que acaba publicado: se avisa aquí, no en un TODO.
 PENDING=""
-[[ "$GH_USER" == "TU_USUARIO" ]] && PENDING+="\n   • README.md y CHANGELOG.md: reemplaza TU_USUARIO (o re-ejecuta con --github-user)."
+[[ "$GH_USER" == "TU_USUARIO" ]] && PENDING+="\n   • README.md y CHANGELOG.md: reemplaza TU_USUARIO por tu usuario u organización de GitHub."
 [[ "$SONAR_ORG" == "TU_ORG_SONAR" ]] && PENDING+="\n   • build.gradle.kts: reemplaza sonar.organization = \"TU_ORG_SONAR\"."
 if [[ -n "$PENDING" ]]; then
     echo ""

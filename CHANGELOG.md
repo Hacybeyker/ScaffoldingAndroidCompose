@@ -32,6 +32,7 @@
 - `build-scan-publish` en CI: cada run publica un Build Scan para diagnosticar fallos sin repetirlos.
 
 ### Changed
+- `init-project.sh --help` lee el encabezado completo en vez de un rango fijo de líneas, que deja de mostrar la ayuda entera en cuanto esta crece.
 - El template se versiona solo en `CHANGELOG.md`, sin tags ni GitHub Releases. La regla está en `AGENTS.md` y `init-project.sh` la quita en los proyectos nuevos, que sí publican versiones con tags; también quita la nota sobre la feature de ejemplo, que en el proyecto nuevo queda como una pantalla mínima. README y SETUP marcan las skills hb-* como opcionales.
 - **CI y release:** los runners pasan de `ubuntu-latest` a `ubuntu-26.04` fijo, `setup-java` y `gradle/actions` suben a su última versión (fijadas por SHA) y el Build Scan se publica solo si el repo es público: los scans van a la instancia pública de Gradle y no heredan la privacidad del repo.
 - **Encabezados estándar de Keep a Changelog** (`Added`, `Changed`, `Removed`, `Fixed`, sin emoji y en ese orden), también en el CHANGELOG que genera `init-project.sh`: es el formato que escriben las skills `hb-*`.
@@ -59,5 +60,9 @@
 - `res/values/colors.xml`: los siete colores del template de Android Studio no los usaba nadie (el tema Compose vive en `core/designsystem/Color.kt`) y generaban siete warnings de `UnusedResources` en cada build.
 - `android:label` redundante en la `<activity>` del manifest, que ya heredaba el de `<application>`.
 - Source set `androidTest` y sus tests de Espresso (`espresso-core` vuelve solo como dependencia interna de los tests JVM; ver Changed): toda la verificación automatizada corre en la JVM (unitarios + Robolectric/Roborazzi) y lo que depende de hardware se prueba a mano en un dispositivo.
+
+### Fixed
+- Un nombre visible con `&`, `|`, `\`, comillas o un `@`/`?` al inicio rompía el reemplazo de `init-project.sh` o el `strings.xml`: ahora se escapa para sed, XML y aapt2.
+- `init-project.sh` valida el usuario de GitHub con las reglas de GitHub, y el aviso final ya no sugiere volver a correr el script, que no se puede ejecutar dos veces.
 
 [Unreleased]: https://github.com/Hacybeyker/ScaffoldingAndroidCompose/commits/main
