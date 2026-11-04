@@ -162,4 +162,3 @@ El agente seguirá automáticamente:
 | `Permission denied` al ejecutar el script | `chmod +x init-project.sh` |
 | "Este scaffolding ya fue inicializado" | El script solo puede ejecutarse una vez; clona la plantilla de nuevo |
 | Gradle no sincroniza tras renombrar | En Android Studio: **File → Invalidate Caches / Restart** |
-| Symlinks rotos en Windows | Ejecuta el script desde **Git Bash** con permisos de symlink habilitados (Developer Mode) |
