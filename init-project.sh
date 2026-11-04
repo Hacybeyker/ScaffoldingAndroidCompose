@@ -319,7 +319,13 @@ replace_placeholders() {
     sedi "s|{{PROJECT_ROOT}}|$PROJECT_NAME|g" "$file"
 }
 
-[[ -f "AGENTS.md" ]] && replace_placeholders "AGENTS.md"
+if [[ -f "AGENTS.md" ]]; then
+    replace_placeholders "AGENTS.md"
+    # La nota sobre la feature de ejemplo deja de aplicar: el paso 4.5 ya la redujo.
+    sedi '/feature\/home. es el ejemplo del template/d' "AGENTS.md"
+    # El proyecto nuevo sí publica versiones con tags: la regla del template no aplica.
+    sedi '/Solo en el repo del template/d' "AGENTS.md"
+fi
 echo "   ✅ AGENTS.md actualizado."
 
 # ── 5b. Organización de SonarCloud ───────────────────────────────────────────

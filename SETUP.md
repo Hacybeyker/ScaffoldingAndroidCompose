@@ -136,11 +136,11 @@ grep -ri "scaffoldingandroidcompose\|com.hacybeyker" --exclude-dir=.git --exclud
 
 ## 6. Empezar a desarrollar con IA
 
-Instala una vez las skills [hb-*](https://github.com/Hacybeyker/agent-skills), abre tu agente (Claude Code, Copilot, Gemini en Android Studio, Junie…) en la raíz del proyecto y pídele lo que necesites:
+Abre tu agente (Claude Code, Copilot, Gemini en Android Studio, Junie…) en la raíz del proyecto y pídele lo que necesites. Es opcional, pero recomendado, instalar antes las skills [hb-*](https://github.com/Hacybeyker/agent-skills): sin ellas el agente trabaja solo con las reglas de `AGENTS.md`, y con ellas suma el perfil de arquitectura y los flujos de abajo.
 
 > *"Implementa la feature de perfil de usuario."*
 
-El agente seguirá automáticamente:
+Con las skills instaladas, el agente sigue automáticamente:
 
 - **Arquitectura**: Clean Architecture + MVVM (UDF) por features, con el perfil `hb-stack-mobile-kotlin`. Cada feature tiene `domain/`, `data/`, `ui/` (ViewModel + UiState/Action, su NavKey en `<Feature>NavKey.kt` y su entry builder en `<Feature>Navigation.kt`) y `di/`; los design tokens están en `core/designsystem/` y `navigation/AppNavDisplay.kt` solo arma el back stack.
 - **Workflow**: features, bugs y refactors de punta a punta con DoD y reporte (`hb-implement`).

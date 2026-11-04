@@ -1,7 +1,8 @@
 # Changelog — ScaffoldingAndroidCompose
 
 > Todos los cambios notables de este proyecto están documentados aquí.
-> Formato basado en [Keep a Changelog](https://keepachangelog.com/es/1.1.0/).
+> Formato basado en [Keep a Changelog](https://keepachangelog.com/es/1.1.0/).  
+> El template se versiona solo en este archivo: no se crean tags ni GitHub Releases.
 
 ---
 
@@ -31,6 +32,7 @@
 - `build-scan-publish` en CI: cada run publica un Build Scan para diagnosticar fallos sin repetirlos.
 
 ### Changed
+- El template se versiona solo en `CHANGELOG.md`, sin tags ni GitHub Releases. La regla está en `AGENTS.md` y `init-project.sh` la quita en los proyectos nuevos, que sí publican versiones con tags; también quita la nota sobre la feature de ejemplo, que en el proyecto nuevo queda como una pantalla mínima. README y SETUP marcan las skills hb-* como opcionales.
 - **CI y release:** los runners pasan de `ubuntu-latest` a `ubuntu-26.04` fijo, `setup-java` y `gradle/actions` suben a su última versión (fijadas por SHA) y el Build Scan se publica solo si el repo es público: los scans van a la instancia pública de Gradle y no heredan la privacidad del repo.
 - **Encabezados estándar de Keep a Changelog** (`Added`, `Changed`, `Removed`, `Fixed`, sin emoji y en ese orden), también en el CHANGELOG que genera `init-project.sh`: es el formato que escriben las skills `hb-*`.
 - **Estructura alineada con el perfil `hb-stack-mobile-kotlin`** sin cambiar el comportamiento ni el aspecto de la app: tokens en `core/designsystem/`; `feature/home` con `domain/model`, `domain/repository`, `data/repository` y el módulo Hilt en `di/HomeModule`; contrato de presentación `HomeUiState` + `HomeAction` con un único `onAction`; `HomeContent` sin estado en su propio archivo; cada feature declara su NavKey en `ui/<Feature>NavKey.kt` y su entry builder en `ui/<Feature>Navigation.kt`, y `navigation/AppNavDisplay.kt` solo arma el back stack; `MainDispatcherRule` en `core/testing`.
@@ -58,4 +60,4 @@
 - `android:label` redundante en la `<activity>` del manifest, que ya heredaba el de `<application>`.
 - Source set `androidTest` y sus tests de Espresso (`espresso-core` vuelve solo como dependencia interna de los tests JVM; ver Changed): toda la verificación automatizada corre en la JVM (unitarios + Robolectric/Roborazzi) y lo que depende de hardware se prueba a mano en un dispositivo.
 
-[Unreleased]: https://github.com/hacybeyker/ScaffoldingAndroidCompose/commits/main
+[Unreleased]: https://github.com/Hacybeyker/ScaffoldingAndroidCompose/commits/main

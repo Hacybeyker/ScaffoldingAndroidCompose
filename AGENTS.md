@@ -38,7 +38,7 @@ Sigue el perfil (Clean Architecture + MVVM con UDF, por features). Particularida
 
 - Un solo módulo, `{{MODULE_NAME}}`, con los paquetes `core/`, `navigation/` y `feature/<nombre>/`. Los design tokens están en `core/designsystem/`.
 - Cada feature declara su NavKey en `ui/<Feature>NavKey.kt` y su entry builder en `ui/<Feature>Navigation.kt`; `navigation/AppNavDisplay.kt` solo arma el back stack y junta los entry builders.
-- `feature/home` es el ejemplo de referencia de una feature completa.
+- `feature/home` es el ejemplo del template: `init-project.sh` lo reduce a una pantalla mínima (`HomeNavKey`, `homeEntry()` y `HomeScreen`).
 - **Sin tests instrumentados:** no existe `androidTest`. El código que depende de hardware (cámara, GPS, biometría, sensores) se verifica a mano en un dispositivo y se excluye del gate de cobertura.
 - `espresso-core` en `testImplementation` no contradice lo anterior: aquí no se escriben tests de Espresso. Lo usa `compose-ui-test` por dentro con Robolectric, y se declara explícito porque la versión que llega transitiva (3.5.1) falla en la API 37, que es la que emulan los tests (`app/src/test/resources/robolectric.properties`). Se puede quitar cuando `compose-ui-test` traiga la 3.7.0 o una superior por su cuenta.
 - Los goldens de Roborazzi se versionan en `app/src/test/screenshots/`.
@@ -65,6 +65,7 @@ Sigue el perfil (Clean Architecture + MVVM con UDF, por features). Particularida
 - SemVer. La versión vive en `gradle/libs.versions.toml` (`appVersion`) y `versionCode`, en `app/build.gradle.kts`, sube de 1 en 1.
 - Tags `vX.Y.Z`, creados por la persona. Al subir el tag, el workflow `release.yml` compila el APK y el AAB y crea el GitHub Release: no lo crees a mano.
 - `CHANGELOG.md` con Keep a Changelog, en español: cada cambio entra en `[Unreleased]`.
+- **Solo en el repo del template:** se versiona únicamente en `CHANGELOG.md`. No se crean tags ni GitHub Releases, y la versión de la app no se toca: es la inicial de los proyectos nuevos. `init-project.sh` borra esta línea.
 
 ## Seguridad
 
