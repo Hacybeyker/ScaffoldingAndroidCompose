@@ -44,7 +44,7 @@ cd MiAppGenial
 ./init-project.sh
 ```
 
-El script te preguntará el **nombre del proyecto**, el **package base** y el **nombre visible de la app**, y hará todo el resto: renombrar archivos, mover paquetes, limpiar la feature de ejemplo, configurar la documentación de IA, crear los symlinks, renombrar la carpeta raíz y dejar el historial de git limpio (squash automático si vienes del scaffolding, o commit encima si vienes de GitHub Template).
+El script te preguntará el **nombre del proyecto**, el **package base** y el **nombre visible de la app**, y hará todo el resto: renombrar archivos, mover paquetes, limpiar la feature de ejemplo, completar `AGENTS.md`, renombrar la carpeta raíz y dejar el historial de git limpio (squash automático si vienes del scaffolding, o commit encima si vienes de GitHub Template).
 
 ¿Prefieres no responder preguntas? Modo no interactivo (ideal para agentes de IA):
 
