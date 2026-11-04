@@ -31,6 +31,7 @@
 - `build-scan-publish` en CI: cada run publica un Build Scan para diagnosticar fallos sin repetirlos.
 
 ### Changed
+- **CI y release:** los runners pasan de `ubuntu-latest` a `ubuntu-26.04` fijo, `setup-java` y `gradle/actions` suben a su última versión (fijadas por SHA) y el Build Scan se publica solo si el repo es público: los scans van a la instancia pública de Gradle y no heredan la privacidad del repo.
 - **Encabezados estándar de Keep a Changelog** (`Added`, `Changed`, `Removed`, `Fixed`, sin emoji y en ese orden), también en el CHANGELOG que genera `init-project.sh`: es el formato que escriben las skills `hb-*`.
 - **Estructura alineada con el perfil `hb-stack-mobile-kotlin`** sin cambiar el comportamiento ni el aspecto de la app: tokens en `core/designsystem/`; `feature/home` con `domain/model`, `domain/repository`, `data/repository` y el módulo Hilt en `di/HomeModule`; contrato de presentación `HomeUiState` + `HomeAction` con un único `onAction`; `HomeContent` sin estado en su propio archivo; cada feature declara su NavKey en `ui/<Feature>NavKey.kt` y su entry builder en `ui/<Feature>Navigation.kt`, y `navigation/AppNavDisplay.kt` solo arma el back stack; `MainDispatcherRule` en `core/testing`.
 - **`targetSdk` 36 → 37**, a la par del `compileSdk`: por debajo, Android aplica modos de compatibilidad y Lint reporta `OldTargetApi`. Los tests JVM corren en la misma API 37, fijada en `robolectric.properties`.

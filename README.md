@@ -24,7 +24,7 @@ Clona, ejecuta un script, y en menos de un minuto tienes un proyecto Android con
 | **Reportes HTML** | `./gradlew qualityReports` genera los cuatro (Lint, detekt, ktlint y Kover) e imprime sus rutas `file://` |
 | **Análisis estático en la nube** | **SonarQube/SonarCloud opcional**, alimentado por los reportes de Lint/detekt/ktlint/Kover. Es opt-in: sin el secret `SONAR_TOKEN` el paso se salta y el CI queda verde |
 | **Screenshot testing** | **Roborazzi + Robolectric**: goldens versionados en `app/src/test/screenshots/`, con gate `verifyRoborazziDebug` |
-| **CI/CD (GitHub Actions)** | `ci.yml` (calidad → build/tests/gates/Sonar en cada push/PR) y `release.yml` (APK/AAB + GitHub Release al pushear un tag `v*`) + Dependabot. Actions **pineadas a SHA** y **Build Scan** publicado por run |
+| **CI/CD (GitHub Actions)** | `ci.yml` (calidad → build/tests/gates/Sonar en cada push/PR) y `release.yml` (APK/AAB + GitHub Release al pushear un tag `v*`) + Dependabot. Actions **fijadas por SHA** y **Build Scan** por job en repos públicos |
 | **Release endurecido** | **R8** activo (`optimization`), keep rules en `src/main/keepRules/`, `lint.abortOnError = true` |
 | **Testing** | JUnit + Turbine + Fakes escritos a mano, con `MainDispatcherRule` y tests de ejemplo (UseCase + Repository + ViewModel + golden). Todo en JVM: **sin `androidTest`** |
 
