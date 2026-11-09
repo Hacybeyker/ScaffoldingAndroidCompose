@@ -17,7 +17,7 @@ cat > "$HOOK_FILE" <<'EOF'
 STAGED_KOTLIN=()
 while IFS= read -r -d '' file; do
     STAGED_KOTLIN+=("$file")
-done < <(git diff --cached --name-only -z --diff-filter=ACM -- '*.kt' '*.kts')
+done < <(git diff --cached --name-only -z --diff-filter=ACMR -- '*.kt' '*.kts')
 
 BEFORE=()
 for file in "${STAGED_KOTLIN[@]}"; do
