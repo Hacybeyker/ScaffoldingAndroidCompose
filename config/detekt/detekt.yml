@@ -1,5 +1,5 @@
 # Configuracion de detekt — se aplica SOBRE el ruleset por defecto
-# (buildUponDefaultConfig = true en el build.gradle del modulo).
+# (buildUponDefaultConfig = true en la convencion de calidad: build-logic/.../AndroidQuality.kt).
 #
 # Para regenerar el fichero por defecto completo:
 #   ./gradlew detektGenerateConfig

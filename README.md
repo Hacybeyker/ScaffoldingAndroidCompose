@@ -140,7 +140,8 @@ que hay que escribir su convención en `build-logic/` o dejarlo sin gates a prop
 ### 📊 Reportes
 
 Cada herramienta emite dos formatos: uno HTML para leerlo y uno XML para que lo ingiera Sonar (u otra
-plataforma). Todos cuelgan de `app/build/reports/`.
+plataforma). Cada módulo deja los suyos en su propio `build/reports/` (la tabla usa los de `app`, el único módulo
+de la plantilla) y `qualityReports` imprime las rutas de cada uno.
 
 | Herramienta | HTML (para leer) | XML (para Sonar) |
 |-------------|------------------|------------------|

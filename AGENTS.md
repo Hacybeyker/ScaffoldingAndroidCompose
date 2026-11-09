@@ -45,7 +45,8 @@ Sigue el perfil (Clean Architecture + MVVM con UDF, por features). Particularida
   2. `core-data/src/main/AndroidManifest.xml` con `<manifest />`.
   3. `core-data/build.gradle.kts` con `plugins { alias(libs.plugins.convention.android.library) }`, un bloque `android` (`namespace`, `compileSdk { version = release(37) }`, `defaultConfig { minSdk = 26 }` y `compileOptions` en Java 11) y sus dependencias, por ejemplo `testImplementation(libs.junit)`. Otros plugins (Hilt, Compose, KSP) solo si el módulo los usa.
   4. Quien lo use declara `implementation(project(":core-data"))`.
-  5. Corre el DoD completo desde la raíz: debe quedar en verde con el módulo incluido.
+  5. Actualiza la primera viñeta de esta sección («Un solo módulo…»), que con el módulo nuevo deja de ser verdad.
+  6. Corre el DoD completo desde la raíz: debe quedar en verde con el módulo incluido.
   Kover mide al 90 % las clases `*.domain.*`, `*.data.*` y `*ViewModel*` de cada módulo: si el módulo las tiene, necesita sus tests.
 - Cada feature declara su NavKey en `ui/<Feature>NavKey.kt` y su entry builder en `ui/<Feature>Navigation.kt`; `navigation/AppNavDisplay.kt` solo arma el back stack y junta los entry builders.
 - `feature/home` es el ejemplo del template: `init-project.sh` lo reduce a una pantalla mínima (`HomeNavKey`, `homeEntry()` y `HomeScreen`).

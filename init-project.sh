@@ -482,6 +482,8 @@ ktlint + detekt + Android Lint están preconfigurados. Reglas en \`.editorconfig
 | ktlint | \`app/build/reports/ktlint/<sourceSet>/*.html\` | \`*.xml\` (Checkstyle) |
 | Kover | \`app/build/reports/kover/htmlDebug/index.html\` | \`kover/reportDebug.xml\` |
 
+Las rutas son las del módulo \`app\`; cada módulo deja las suyas en su propio \`build/reports/\`.
+
 ### SonarQube / SonarCloud
 
 El análisis está configurado y **bloquea el CI** si el Quality Gate falla (\`sonar.qualitygate.wait\`).
