@@ -54,6 +54,7 @@ Sigue el perfil (Clean Architecture + MVVM con UDF, por features). Particularida
 ## Reglas del proyecto
 
 - **Nunca sufijes una clase con `Impl`:** nómbrala por lo que la respalda (`RoomBookRepository`, `InMemoryGreetingRepository`). Los dobles de test se llaman `Fake…` o `Stub…`.
+- **Una declaración pública por archivo, con el mismo nombre:** cada clase, objeto o interfaz pública vive en un archivo que se llama como ella (`HomeUiState` en `HomeUiState.kt`), y una segunda va en su propio archivo. detekt `MatchingDeclarationName` falla cuando el único tipo de un archivo se llama distinto que el archivo, por ejemplo tras renombrar uno de los dos.
 - **Comentarios:** por defecto ninguno. Solo el porqué, una decisión o una advertencia; nunca lo que el nombre ya dice.
 - Imports con comodín y trailing commas prohibidos (ktlint los rechaza en el build). Sin comentarios en línea en `libs.versions.toml`.
 - **Gradle se sube con la tarea `wrapper`, nunca editando `gradle-wrapper.properties` a mano.** `distributionSha256Sum` verifica la distribución que se descarga: si solo cambia `distributionUrl`, el build falla por checksum. El sha256 es el de `gradle-X.Y.Z-bin.zip` (el wrapper usa la distribución `-bin`) y está en `https://downloads.gradle.org/distributions/gradle-X.Y.Z-bin.zip.sha256`. El comando se corre dos veces: la primera fija la versión nueva y la segunda, ya con ella, regenera `gradle-wrapper.jar`, `gradlew` y `gradlew.bat`. Si un PR de Dependabot sube Gradle, revisa que cambie la URL y el checksum juntos.
