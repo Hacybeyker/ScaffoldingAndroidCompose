@@ -121,6 +121,9 @@ detekt {
     parallel = true
     config.setFrom(files("$rootDir/config/detekt/detekt.yml"))
     basePath = rootDir
+    // El source por defecto solo cubre src/main y src/test: los unit tests por buildType (src/testDebug) y
+    // el código de src/debug o src/release quedaban sin analizar.
+    source.setFrom("src")
 }
 
 ktlint {
