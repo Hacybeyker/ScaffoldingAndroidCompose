@@ -1,3 +1,5 @@
+import org.jlleitschuh.gradle.ktlint.tasks.KtLintCheckTask
+
 plugins {
     `kotlin-dsl`
     alias(libs.plugins.ktlint)
@@ -6,6 +8,8 @@ plugins {
 ktlint {
     android.set(true)
 }
+
+tasks.withType<KtLintCheckTask>().configureEach { mustRunAfter("ktlintFormat") }
 
 // compileOnly: las clases de estos plugins las pone el build raíz en el classpath (los declara con
 // `apply false`). Con implementation habría dos copias de AGP, la del build raíz y la de esta convención.

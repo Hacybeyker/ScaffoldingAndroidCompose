@@ -12,6 +12,7 @@ plugins {
     alias(libs.plugins.kover) apply false
     alias(libs.plugins.roborazzi) apply false
     alias(libs.plugins.sonarqube)
+    alias(libs.plugins.convention.ktlint)
 }
 
 val sonarHostUrl =
@@ -31,3 +32,9 @@ sonar {
         property("sonar.qualitygate.wait", "true")
     }
 }
+
+// build-logic es un build aparte: sus tareas no corren con las del raíz salvo que se enganchen aquí.
+val buildLogic = gradle.includedBuild("build-logic")
+
+tasks.named("codeQuality") { dependsOn(buildLogic.task(":ktlintCheck")) }
+tasks.named("formatAndAnalyze") { dependsOn(buildLogic.task(":ktlintFormat")) }
