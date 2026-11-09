@@ -19,7 +19,7 @@ Clona, ejecuta un script, y en menos de un minuto tienes un proyecto Android con
 | **`AGENTS.md`** | Reglas del proyecto para agentes de IA (estándar [agents.md](https://agents.md/)); `CLAUDE.md` lo importa para Claude Code |
 | **Skills globales** | Las skills [hb-*](https://github.com/Hacybeyker/agent-skills) (implementar, revisar, commits, releases) se instalan una vez por máquina, no por proyecto |
 | **Catálogo de versiones** | `gradle/libs.versions.toml` centralizado (Kotlin 2.4, AGP 9, Compose BOM), mantenido al día por Dependabot |
-| **Calidad de código** | **ktlint + detekt + Android Lint** preconfigurados con tareas agregadas (`./gradlew formatAndAnalyze`) — reglas en `.editorconfig`, `config/detekt/detekt.yml` y `lint.xml` |
+| **Calidad de código** | **ktlint + detekt + Android Lint** preconfigurados con tareas agregadas (`./gradlew formatAndAnalyze`) — reglas en `.editorconfig`, `config/detekt/detekt.yml` y `lint.xml`. Se configuran una vez en `build-logic/` (convention plugins) y cada módulo Android los recibe con una línea, así que la plantilla está lista para sumar módulos (receta en `AGENTS.md`) |
 | **Cobertura con gate** | **Kover** al 90% sobre `domain`/`data`/`ViewModels` (codegen y frontera de plataforma excluidos) |
 | **Reportes HTML** | `./gradlew qualityReports` genera los cuatro (Lint, detekt, ktlint y Kover) e imprime sus rutas `file://` |
 | **Análisis estático en la nube** | **SonarQube/SonarCloud opcional**, alimentado por los reportes de Lint/detekt/ktlint/Kover. Es opt-in: sin el secret `SONAR_TOKEN` el paso se salta y el CI queda verde |
@@ -27,6 +27,20 @@ Clona, ejecuta un script, y en menos de un minuto tienes un proyecto Android con
 | **CI/CD (GitHub Actions)** | `ci.yml` (calidad → build/tests/gates/Sonar en cada push/PR) y `release.yml` (APK/AAB + GitHub Release al pushear un tag `v*`) + Dependabot. Actions **fijadas por SHA** y **Build Scan** por job en repos públicos |
 | **Release endurecido** | **R8** activo (`optimization`), keep rules en `src/main/keepRules/`, `lint.abortOnError = true` |
 | **Testing** | JUnit + Turbine + Fakes escritos a mano, con `MainDispatcherRule` y tests de ejemplo (UseCase + Repository + ViewModel + golden). Todo en JVM: **sin `androidTest`** |
+
+## 🚫 Qué no incluye
+
+La plantilla es la base de la app, no una app completa. Todo lo siguiente se agrega en
+`gradle/libs.versions.toml` y, dentro de cada feature, en `data/` (el contrato de `domain/repository` no cambia):
+
+| Área | Qué falta | Hoy |
+|------|-----------|-----|
+| **Red** | Retrofit, OkHttp, Ktor y `kotlinx-serialization-json` | `kotlinx-serialization-core` solo serializa las `NavKey`; no hay cliente HTTP ni parseo de JSON |
+| **Persistencia** | Room y DataStore | La feature de ejemplo guarda el estado en memoria (`InMemoryGreetingRepository`) |
+| **Imágenes** | Coil, Glide o similares | `material-icons-core` trae solo los íconos básicos |
+| **Navigation Compose** | `NavHost` y `NavController` | La navegación es **Navigation 3** (`androidx.navigation3`: `NavDisplay`, `rememberNavBackStack` y `entryProvider`). Es otra librería, con otras APIs: los ejemplos de Navigation Compose no se copian tal cual |
+
+Tampoco trae tests instrumentados (todo corre en la JVM) ni la firma de release (ver `release.yml`).
 
 ## 📋 Requisitos
 
@@ -44,7 +58,7 @@ cd MiAppGenial
 ./init-project.sh
 ```
 
-El script te preguntará el **nombre del proyecto**, el **package base** y el **nombre visible de la app**, y hará todo el resto: renombrar archivos, mover paquetes, limpiar la feature de ejemplo, completar `AGENTS.md`, renombrar la carpeta raíz y dejar el historial de git limpio (squash automático si vienes del scaffolding, o commit encima si vienes de GitHub Template).
+El script te preguntará el **nombre del proyecto**, el **package base**, el **nombre visible de la app** y la **licencia** (MIT por defecto), y hará todo el resto: renombrar archivos, mover paquetes, limpiar la feature de ejemplo, completar `AGENTS.md`, renombrar la carpeta raíz y dejar el historial de git limpio (squash automático si vienes del scaffolding, o commit encima si vienes de GitHub Template).
 
 ¿Prefieres no responder preguntas? Modo no interactivo (ideal para agentes de IA):
 
@@ -76,6 +90,7 @@ El script te preguntará el **nombre del proyecto**, el **package base** y el **
 │       ├── data/          #   repository/: InMemoryGreetingRepository
 │       ├── ui/            #   Screen/Content + ViewModel + UiState/Action + NavKey + Navigation (entry builder)
 │       └── di/            #   HomeModule (Hilt, @Binds)
+├── build-logic/           # Convention plugins: ktlint, detekt, Lint, Kover y Roborazzi de cada módulo
 ├── AGENTS.md              # Reglas del proyecto para agentes de IA
 ├── CLAUDE.md              # Importa AGENTS.md para Claude Code
 ├── init-project.sh        # ⚡ Inicializador del scaffolding
@@ -94,7 +109,7 @@ El script te preguntará el **nombre del proyecto**, el **package base** y el **
 ./gradlew test
 
 # Calidad de código (ktlint + detekt + Android Lint)
-./gradlew formatAndAnalyze     # formatea y verifica todo
+./gradlew formatAndAnalyze     # formatea, verifica y compila los tests
 ./gradlew codeQuality          # solo verifica (ideal para CI)
 
 # Reportes HTML navegables (imprime las rutas file:// al terminar)
@@ -110,10 +125,23 @@ El script te preguntará el **nombre del proyecto**, el **package base** y el **
 > El CI encadena `test koverVerifyDebug verifyRoborazziDebug` en una sola invocación: los tests corren
 > **una vez** y los tres gates reutilizan esa corrida.
 
+### 🧩 Sumar módulos
+
+Los gates (ktlint, detekt, Lint, Kover y Roborazzi) viven en `build-logic/`. Un módulo los recibe declarando
+`alias(libs.plugins.convention.android.library)` (o `…android.application`) en lugar del plugin de Android
+pelado; la receta completa está en `AGENTS.md`.
+
+Un módulo que aplica un plugin de Android o de Kotlin (`kotlin("jvm")`, `com.android.test`, Kotlin
+Multiplatform…) sin una convención de calidad **hace fallar la configuración** con un mensaje que lo explica:
+así no queda sin gates sin que nadie se entere. Para esos tipos de módulo la plantilla aún no trae gates, así
+que hay que escribir su convención en `build-logic/` o dejarlo sin gates a propósito con
+`alias(libs.plugins.convention.quality.exempt)`.
+
 ### 📊 Reportes
 
 Cada herramienta emite dos formatos: uno HTML para leerlo y uno XML para que lo ingiera Sonar (u otra
-plataforma). Todos cuelgan de `app/build/reports/`.
+plataforma). Cada módulo deja los suyos en su propio `build/reports/` (la tabla usa los de `app`, el único módulo
+de la plantilla) y `qualityReports` imprime las rutas de cada uno.
 
 | Herramienta | HTML (para leer) | XML (para Sonar) |
 |-------------|------------------|------------------|
@@ -139,7 +167,7 @@ define además la variable de repo `SONAR_HOST_URL`.
 
 ## 📄 Licencia
 
-Usa esta plantilla libremente para cualquier proyecto, personal o comercial.
+Usa esta plantilla libremente para cualquier proyecto, personal o comercial. `init-project.sh` genera el `LICENSE` de tu proyecto (MIT por defecto, o ninguno con `--license none`).
 
 ---
 

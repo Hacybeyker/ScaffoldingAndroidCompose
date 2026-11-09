@@ -1,11 +1,18 @@
-// Top-level build file where you can add configuration options common to all sub-projects/modules.
+// Los plugins con `apply false` ponen sus clases en el classpath que comparten los módulos y build-logic.
+// La calidad (ktlint, detekt, Lint, Kover, Roborazzi) vive en build-logic/ como convention plugins.
 plugins {
     alias(libs.plugins.android.application) apply false
+    alias(libs.plugins.android.library) apply false
     alias(libs.plugins.kotlin.compose) apply false
     alias(libs.plugins.kotlin.serialization) apply false
     alias(libs.plugins.hilt) apply false
     alias(libs.plugins.ksp) apply false
+    alias(libs.plugins.ktlint) apply false
+    alias(libs.plugins.detekt) apply false
+    alias(libs.plugins.kover) apply false
+    alias(libs.plugins.roborazzi) apply false
     alias(libs.plugins.sonarqube)
+    alias(libs.plugins.convention.ktlint)
 }
 
 val sonarHostUrl =
@@ -26,12 +33,8 @@ sonar {
     }
 }
 
-tasks.named("sonar") {
-    dependsOn(
-        ":app:lint",
-        ":app:detekt",
-        ":app:ktlintCheck",
-        ":app:testDebugUnitTest",
-        ":app:koverXmlReportDebug"
-    )
-}
+// build-logic es un build aparte: sus tareas no corren con las del raíz salvo que se enganchen aquí.
+val buildLogic = gradle.includedBuild("build-logic")
+
+tasks.named("codeQuality") { dependsOn(buildLogic.task(":ktlintCheck")) }
+tasks.named("formatAndAnalyze") { dependsOn(buildLogic.task(":ktlintFormat")) }
