@@ -69,9 +69,6 @@ android {
         checkDependencies = true
         checkReleaseBuilds = true
         lintConfig = file("$rootDir/lint.xml")
-        htmlReport = true
-        sarifReport = true
-        textReport = true
     }
 }
 

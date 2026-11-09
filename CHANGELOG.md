@@ -61,6 +61,7 @@
 - `res/values/colors.xml`: los siete colores del template de Android Studio no los usaba nadie (el tema Compose vive en `core/designsystem/Color.kt`) y generaban siete warnings de `UnusedResources` en cada build.
 - `android:label` redundante en la `<activity>` del manifest, que ya heredaba el de `<application>`.
 - Source set `androidTest` y sus tests de Espresso (`espresso-core` vuelve solo como dependencia interna de los tests JVM; ver Changed): toda la verificación automatizada corre en la JVM (unitarios + Robolectric/Roborazzi) y lo que depende de hardware se prueba a mano en un dispositivo.
+- `htmlReport`, `sarifReport` y `textReport` del bloque `lint {}`: AGP 9.5.1 los marca como obsoletos («Lint reports are now always generated») y, con o sin ellos, se generan los cuatro reportes (HTML, XML, SARIF y TXT), así que quitarlos no cambia ninguna salida.
 
 ### Fixed
 - **`formatAndAnalyze` converge en una sola invocación.** Los `ktlint*SourceSetCheck` fallaban con violaciones que `ktlintFormat` ya había corregido en esa misma corrida, porque el `mustRunAfter` estaba puesto solo sobre el agregado `ktlintCheck` y sus subtareas arrancaban antes que el formato. Ahora el orden se declara sobre cada check por source set.
