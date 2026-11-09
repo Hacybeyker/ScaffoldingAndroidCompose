@@ -25,6 +25,11 @@
 #   -o, --sonar-org Organización de SonarCloud. Default: el valor de --github-user
 #                   (SonarCloud crea la organización con la clave de la de GitHub).
 #                   → se usa como: sonar.organization en build.gradle.kts.
+#   -l, --license  Licencia del proyecto: MIT (default) o none (sin LICENSE: todos los derechos
+#                   reservados). Para otra licencia, elige none y agrega tu LICENSE.
+#                   → se genera como: LICENSE (y una sección Licencia en el README).
+#       --author   Titular del copyright del LICENSE. Default: git config user.name o, si no hay,
+#                   el usuario de GitHub. Con ninguno de los dos queda el placeholder TU_NOMBRE.
 #   -y, --yes       Responde "sí" a todas las confirmaciones (limpieza de archivos)
 #   -h, --help      Muestra esta ayuda
 
@@ -80,6 +85,8 @@ PROJECT_NAME=""
 PACKAGE_NAME=""
 APP_NAME=""
 SONAR_ORG=""
+LICENSE_ID=""
+AUTHOR=""
 # GITHUB_USER se acepta como variable de entorno; --github-user gana sobre ella.
 GH_USER="${GITHUB_USER:-}"
 ASSUME_YES=false
@@ -91,6 +98,8 @@ while [[ $# -gt 0 ]]; do
         -a|--app-name)    APP_NAME="$2"; shift 2 ;;
         -g|--github-user) GH_USER="$2"; shift 2 ;;
         -o|--sonar-org)   SONAR_ORG="$2"; shift 2 ;;
+        -l|--license)     LICENSE_ID="$2"; shift 2 ;;
+        --author)         AUTHOR="$2"; shift 2 ;;
         -y|--yes)         ASSUME_YES=true; shift ;;
         -h|--help)        usage ;;
         *)                die "Flag desconocida: $1 (usa --help)" ;;
@@ -124,6 +133,24 @@ fi
 SONAR_ORG=${SONAR_ORG:-${GH_USER:-TU_ORG_SONAR}}
 GH_USER=${GH_USER:-TU_USUARIO}
 
+if [[ -z "$LICENSE_ID" && "$ASSUME_YES" == false ]]; then
+    echo "📜 Licencia del proyecto: MIT o none (sin LICENSE: todos los derechos reservados)."
+    read -r -p "   [MIT]: " LICENSE_ID
+fi
+case "$(printf '%s' "${LICENSE_ID:-MIT}" | tr '[:upper:]' '[:lower:]')" in
+    mit)  LICENSE_ID="MIT" ;;
+    none) LICENSE_ID="none" ;;
+    *)    die "Licencia no soportada: '$LICENSE_ID'. Usa MIT o none (para otra licencia, elige none y agrega tu LICENSE)." ;;
+esac
+if [[ "$LICENSE_ID" == "MIT" ]]; then
+    [[ -n "$AUTHOR" ]] || AUTHOR=$(git config user.name 2>/dev/null || true)
+    [[ -n "$AUTHOR" || "$GH_USER" == "TU_USUARIO" ]] || AUTHOR="$GH_USER"
+    if [[ -z "$AUTHOR" && "$ASSUME_YES" == false ]]; then
+        read -r -p "   Titular del copyright [TU_NOMBRE]: " AUTHOR
+    fi
+    AUTHOR=${AUTHOR:-TU_NOMBRE}
+fi
+
 # ── 2. Validaciones ──────────────────────────────────────────────────────────
 [[ -n "$PROJECT_NAME" && -n "$PACKAGE_NAME" ]] || die "El nombre del proyecto y el package son obligatorios."
 
@@ -154,6 +181,7 @@ echo "   - App visible (launcher):           $APP_NAME"
 echo "   - Package:                          $PACKAGE_NAME"
 echo "   - Usuario/org de GitHub:            $GH_USER"
 echo "   - Organización SonarCloud:          $SONAR_ORG"
+echo "   - Licencia:                         $LICENSE_ID${AUTHOR:+ (© $AUTHOR)}"
 echo "   - Root:                             $PROJECT_ROOT"
 echo ""
 
@@ -482,6 +510,16 @@ El agente aplica Clean Architecture + MVVM (UDF) por features con el perfil \`hb
 
 Ver [CHANGELOG.md](./CHANGELOG.md) para el historial de cambios.
 EOF
+if [[ "$LICENSE_ID" != "none" ]]; then
+    cat >> README.md <<EOF
+
+---
+
+## 📜 Licencia
+
+Distribuido bajo la licencia $LICENSE_ID. Ver [LICENSE](./LICENSE).
+EOF
+fi
 echo "   ✅ README.md generado."
 
 # ── 7b. CHANGELOG del nuevo proyecto ─────────────────────────────────────────
@@ -520,9 +558,48 @@ cat > CHANGELOG.md <<EOF
 
 -->
 
-[Unreleased]: https://github.com/$GH_USER/$PROJECT_NAME/compare/v1.0.0...HEAD
+<!-- Mientras no exista el primer tag, [Unreleased] enlaza a los commits: compare/v1.0.0...HEAD daría
+     un 404. Al crear v1.0.0, cámbialo a https://github.com/$GH_USER/$PROJECT_NAME/compare/v1.0.0...HEAD
+     y agrega [1.0.0]: https://github.com/$GH_USER/$PROJECT_NAME/releases/tag/v1.0.0 -->
+[Unreleased]: https://github.com/$GH_USER/$PROJECT_NAME/commits/main
 EOF
 echo "   ✅ CHANGELOG.md generado."
+
+# ── 7c. LICENSE ──────────────────────────────────────────────────────────────
+# Un LICENSE que ya exista (por ejemplo, el que GitHub crea con un repo desde la plantilla) no se pisa.
+if [[ "$LICENSE_ID" == "MIT" ]]; then
+    if [[ -e LICENSE ]]; then
+        echo "📜 Ya existe un LICENSE: no se toca."
+    else
+        echo "📜 Generando LICENSE (MIT)..."
+        cat > LICENSE <<EOF
+MIT License
+
+Copyright (c) $(date +%Y) $AUTHOR
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+EOF
+        echo "   ✅ LICENSE generado."
+    fi
+else
+    echo "📜 Sin LICENSE: todos los derechos reservados."
+fi
 
 # ── 8. Limpieza de archivos del scaffolding ──────────────────────────────────
 CLEANUP="n"
@@ -620,6 +697,7 @@ echo "   7. Con las skills hb-* instaladas, pídele a tu IA: 'Implementa la feat
 PENDING=""
 [[ "$GH_USER" == "TU_USUARIO" ]] && PENDING+="\n   • README.md y CHANGELOG.md: reemplaza TU_USUARIO por tu usuario u organización de GitHub."
 [[ "$SONAR_ORG" == "TU_ORG_SONAR" ]] && PENDING+="\n   • build.gradle.kts: reemplaza sonar.organization = \"TU_ORG_SONAR\"."
+[[ "$LICENSE_ID" == "MIT" && "$AUTHOR" == "TU_NOMBRE" ]] && PENDING+="\n   • LICENSE: reemplaza TU_NOMBRE por el titular del copyright."
 if [[ -n "$PENDING" ]]; then
     echo ""
     echo "📝 Placeholders pendientes de rellenar:$(printf '%b' "$PENDING")"

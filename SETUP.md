@@ -39,6 +39,7 @@ El script pregunta:
 | 📦 Package base | `com.empresa.miapp` | Minúsculas separadas por puntos |
 | 🏷️ Nombre visible de la app | `Mi App Genial` | Libre (puede tener espacios). Default: el nombre del proyecto |
 | 🐙 Usuario u org de GitHub | `mi-empresa` | Opcional. Alimenta los badges del README, los links del CHANGELOG y, por defecto, `sonar.organization` |
+| 📜 Licencia | `MIT` | `MIT` (default) o `none`. Con `MIT` genera el `LICENSE`; con `none` no genera ninguno (todos los derechos reservados) |
 
 Al final pregunta por **una limpieza opcional** (recomendada):
 
@@ -62,14 +63,16 @@ Y aplica **automáticamente** estas tareas (no necesitas hacer nada):
   --package com.empresa.miapp \
   --app-name "Mi App Genial" \
   --github-user mi-empresa \
+  --license MIT \
+  --author "Mi Empresa" \
   --yes
 ```
 
-Con `--yes` no se hacen preguntas: se confirma todo y se eliminan los archivos del scaffolding. El manejo de git sigue siendo automático.
+Con `--yes` no se hacen preguntas: se confirma todo, la licencia es MIT si no pasas `--license` y se eliminan los archivos del scaffolding. El manejo de git sigue siendo automático.
 
 ### Todo lo específico del proyecto es dinámico
 
-Ningún valor del autor de la plantilla sobrevive al init. Estos son los cuatro datos de entrada y lo que deriva de cada uno:
+Ningún valor del autor de la plantilla sobrevive al init. Estos son los datos de entrada y lo que deriva de cada uno:
 
 | Entrada | Deriva |
 |---------|--------|
@@ -77,10 +80,12 @@ Ningún valor del autor de la plantilla sobrevive al init. Estos son los cuatro 
 | `--package` | `namespace`, `applicationId`, declaraciones `package`/`import`, `sonar.projectKey` |
 | `--app-name` | `app_name` en `strings.xml` (lo que se ve en el launcher) |
 | `--github-user` | Badges del README, links del CHANGELOG y, si no pasas `--sonar-org`, `sonar.organization` |
+| `--license` | `LICENSE` (solo con `MIT`) y la sección Licencia del README |
+| `--author` | Titular del copyright del `LICENSE`. Si lo omites: `git config user.name`, luego el usuario de GitHub y, sin ninguno, el placeholder `TU_NOMBRE` |
 
 `--sonar-org` solo hace falta cuando tu organización de SonarCloud **no** coincide con la de GitHub (SonarCloud crea la organización con la clave de la de GitHub, así que normalmente coinciden).
 
-Si omites `--github-user` y `--sonar-org`, el script deja los placeholders `TU_USUARIO` y `TU_ORG_SONAR`, y **te los lista al terminar** para que no acaben publicados.
+Si omites `--github-user` y `--sonar-org`, el script deja los placeholders `TU_USUARIO` y `TU_ORG_SONAR` (y `TU_NOMBRE` en el `LICENSE` si no hay nombre que usar), y **te los lista al terminar** para que no acaben publicados.
 
 ## 4. ¿Qué modifica exactamente el script?
 
@@ -99,7 +104,8 @@ Si omites `--github-user` y `--sonar-org`, el script deja los placeholders `TU_U
 | **IntelliJ/Android Studio** | `.idea/*.iml`, `.idea/modules.xml`, `.idea/.name` | Renombrados con el nuevo nombre del proyecto |
 | **Carpeta raíz** | El directorio del proyecto | Renombrado automáticamente si no coincide con `--name` |
 | **Git** | Historial local + remoto | Squash (Opción A) o commit-on-top (Opción B) — sin `--force` |
-| **README / CHANGELOG** | `README.md`, `CHANGELOG.md` | Se regeneran con la información de tu proyecto |
+| **README / CHANGELOG** | `README.md`, `CHANGELOG.md` | Se regeneran con la información de tu proyecto. El link `[Unreleased]` del CHANGELOG apunta a los commits hasta que exista el primer tag |
+| **Licencia** | `LICENSE` | Se genera con `--license MIT` (no pisa un `LICENSE` que ya exista) |
 
 ## 5. Verificación post-setup
 
