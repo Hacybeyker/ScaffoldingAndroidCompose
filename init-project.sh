@@ -30,6 +30,8 @@
 #                   → se genera como: LICENSE (y una sección Licencia en el README).
 #       --author   Titular del copyright del LICENSE. Default: git config user.name o, si no hay,
 #                   el usuario de GitHub. Con ninguno de los dos queda el placeholder TU_NOMBRE.
+#                   Solo cuenta si se genera el LICENSE: con --license none, o con un LICENSE que
+#                   ya existe en la carpeta, se ignora.
 #   -y, --yes       Responde "sí" a todas las confirmaciones (limpieza de archivos)
 #   -h, --help      Muestra esta ayuda
 
@@ -142,13 +144,18 @@ case "$(printf '%s' "${LICENSE_ID:-MIT}" | tr '[:upper:]' '[:lower:]')" in
     none) LICENSE_ID="none" ;;
     *)    die "Licencia no soportada: '$LICENSE_ID'. Usa MIT o none (para otra licencia, elige none y agrega tu LICENSE)." ;;
 esac
-if [[ "$LICENSE_ID" == "MIT" ]]; then
+# Un LICENSE que ya existe manda: no se pisa, no hace falta un titular y el README no puede nombrar otra licencia.
+LICENSE_FILE_KEPT=false
+[[ "$LICENSE_ID" == "MIT" && -e LICENSE ]] && LICENSE_FILE_KEPT=true
+if [[ "$LICENSE_ID" == "MIT" && "$LICENSE_FILE_KEPT" == false ]]; then
     [[ -n "$AUTHOR" ]] || AUTHOR=$(git config user.name 2>/dev/null || true)
     [[ -n "$AUTHOR" || "$GH_USER" == "TU_USUARIO" ]] || AUTHOR="$GH_USER"
     if [[ -z "$AUTHOR" && "$ASSUME_YES" == false ]]; then
         read -r -p "   Titular del copyright [TU_NOMBRE]: " AUTHOR
     fi
     AUTHOR=${AUTHOR:-TU_NOMBRE}
+else
+    AUTHOR=""
 fi
 
 # ── 2. Validaciones ──────────────────────────────────────────────────────────
@@ -181,7 +188,11 @@ echo "   - App visible (launcher):           $APP_NAME"
 echo "   - Package:                          $PACKAGE_NAME"
 echo "   - Usuario/org de GitHub:            $GH_USER"
 echo "   - Organización SonarCloud:          $SONAR_ORG"
-echo "   - Licencia:                         $LICENSE_ID${AUTHOR:+ (© $AUTHOR)}"
+if [[ "$LICENSE_FILE_KEPT" == true ]]; then
+    echo "   - Licencia:                         se conserva el LICENSE que ya existe"
+else
+    echo "   - Licencia:                         $LICENSE_ID${AUTHOR:+ (© $AUTHOR)}"
+fi
 echo "   - Root:                             $PROJECT_ROOT"
 echo ""
 
@@ -514,19 +525,27 @@ El agente aplica Clean Architecture + MVVM (UDF) por features con el perfil \`hb
 Ver [CHANGELOG.md](./CHANGELOG.md) para el historial de cambios.
 EOF
 if [[ "$LICENSE_ID" != "none" ]]; then
+    LICENSE_LINE="Distribuido bajo la licencia MIT. Ver [LICENSE](./LICENSE)."
+    if [[ "$LICENSE_FILE_KEPT" == true ]] && ! head -1 LICENSE | grep -q '^MIT License'; then
+        LICENSE_LINE="Distribuido bajo los términos de [LICENSE](./LICENSE)."
+    fi
     cat >> README.md <<EOF
 
 ---
 
 ## 📜 Licencia
 
-Distribuido bajo la licencia $LICENSE_ID. Ver [LICENSE](./LICENSE).
+$LICENSE_LINE
 EOF
 fi
 echo "   ✅ README.md generado."
 
 # ── 7b. CHANGELOG del nuevo proyecto ─────────────────────────────────────────
 echo "📝 Generando CHANGELOG.md del nuevo proyecto..."
+# El paso 9 conserva el nombre de la rama actual al squashear, así que el link no puede asumir `main`.
+# Sin repositorio (descarga como ZIP) se queda en `main`.
+DEFAULT_BRANCH=main
+[[ -d .git ]] && DEFAULT_BRANCH=$(git symbolic-ref --short HEAD 2>/dev/null || echo main)
 INIT_DATE=$(date +%Y-%m-%d)
 cat > CHANGELOG.md <<EOF
 # Changelog — $APP_NAME
@@ -564,12 +583,13 @@ cat > CHANGELOG.md <<EOF
 <!-- Mientras no exista el primer tag, [Unreleased] enlaza a los commits: compare/v1.0.0...HEAD daría
      un 404. Al crear v1.0.0, cámbialo a https://github.com/$GH_USER/$PROJECT_NAME/compare/v1.0.0...HEAD
      y agrega [1.0.0]: https://github.com/$GH_USER/$PROJECT_NAME/releases/tag/v1.0.0 -->
-[Unreleased]: https://github.com/$GH_USER/$PROJECT_NAME/commits/main
+[Unreleased]: https://github.com/$GH_USER/$PROJECT_NAME/commits/$DEFAULT_BRANCH
 EOF
 echo "   ✅ CHANGELOG.md generado."
 
 # ── 7c. LICENSE ──────────────────────────────────────────────────────────────
-# Un LICENSE que ya exista (por ejemplo, el que GitHub crea con un repo desde la plantilla) no se pisa.
+# Un LICENSE que ya exista (el que la persona agregó antes de correr el script) no se pisa. Crear un repo desde
+# la plantilla de GitHub no genera ninguno: la plantilla no trae LICENSE y ese formulario no pide licencia.
 if [[ "$LICENSE_ID" == "MIT" ]]; then
     if [[ -e LICENSE ]]; then
         echo "📜 Ya existe un LICENSE: no se toca."
