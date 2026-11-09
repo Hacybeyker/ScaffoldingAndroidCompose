@@ -1,3 +1,5 @@
+import org.jlleitschuh.gradle.ktlint.tasks.KtLintCheckTask
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
@@ -139,7 +141,10 @@ tasks.register("codeQuality") {
     dependsOn("ktlintCheck", "detekt", "lint")
 }
 
-listOf("ktlintCheck", "detekt", "lint").forEach { check ->
+// El orden se declara sobre cada check por source set (ktlintMainSourceSetCheck, ...): un mustRunAfter
+// sobre el agregado ktlintCheck solo lo ordena a él, y sus subtareas arrancan antes que el formato.
+tasks.withType<KtLintCheckTask>().configureEach { mustRunAfter("ktlintFormat") }
+listOf("detekt", "lint").forEach { check ->
     tasks.named(check) { mustRunAfter("ktlintFormat") }
 }
 

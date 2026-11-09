@@ -62,6 +62,7 @@
 - Source set `androidTest` y sus tests de Espresso (`espresso-core` vuelve solo como dependencia interna de los tests JVM; ver Changed): toda la verificación automatizada corre en la JVM (unitarios + Robolectric/Roborazzi) y lo que depende de hardware se prueba a mano en un dispositivo.
 
 ### Fixed
+- **`formatAndAnalyze` converge en una sola invocación.** Los `ktlint*SourceSetCheck` fallaban con violaciones que `ktlintFormat` ya había corregido en esa misma corrida, porque el `mustRunAfter` estaba puesto solo sobre el agregado `ktlintCheck` y sus subtareas arrancaban antes que el formato. Ahora el orden se declara sobre cada check por source set.
 - Un nombre visible con `&`, `|`, `\`, comillas o un `@`/`?` al inicio rompía el reemplazo de `init-project.sh` o el `strings.xml`: ahora se escapa para sed, XML y aapt2.
 - `init-project.sh` valida el usuario de GitHub con las reglas de GitHub, y el aviso final ya no sugiere volver a correr el script, que no se puede ejecutar dos veces.
 
