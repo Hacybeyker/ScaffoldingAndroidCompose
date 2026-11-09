@@ -129,9 +129,11 @@ internal fun Project.applyAndroidQualityGates() {
         )
     }
 
+    // `detekt` no resuelve tipos, así que reglas como LongParameterList no corren ahí; detektMain y detektTest sí y,
+    // juntas, cubren main, debug, release, test y testDebug.
     tasks.named("codeQuality") {
         description = "Ejecuta Android Lint + ktlint + detekt en un solo comando."
-        dependsOn("detekt", "lint")
+        dependsOn("detekt", "detektMain", "detektTest", "lint")
     }
 
     // El orden se declara sobre cada check por source set (ktlintMainSourceSetCheck, ...): un mustRunAfter
