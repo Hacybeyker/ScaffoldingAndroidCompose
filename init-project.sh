@@ -460,7 +460,7 @@ Para activarlo: importa el repo en [sonarcloud.io](https://sonarcloud.io), **des
 Analysis** y añade el secret \`SONAR_TOKEN\` al repositorio. Mientras el secret no exista, el paso se
 salta y el CI sigue en verde. Para una instancia self-hosted, exporta \`SONAR_HOST_URL\`.
 
-El proyecto incluye un **pre-commit hook** que ejecuta \`formatAndAnalyze\` automáticamente antes de cada commit. Instálalo una sola vez tras clonar:
+El proyecto incluye un **pre-commit hook** que ejecuta \`formatAndAnalyze\` automáticamente antes de cada commit. Si corrige el formato de algún archivo del commit, lista cuáles y los incluye; si no cambia nada, no dice nada. Instálalo una sola vez tras clonar:
 
 \`\`\`bash
 chmod +x scripts/setup-quality-hook.sh && ./scripts/setup-quality-hook.sh
