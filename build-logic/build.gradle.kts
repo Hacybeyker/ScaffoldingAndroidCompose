@@ -33,5 +33,9 @@ gradlePlugin {
             id = "convention.ktlint"
             implementationClass = "convention.KtlintConventionPlugin"
         }
+        register("qualityExempt") {
+            id = "convention.quality-exempt"
+            implementationClass = "convention.QualityExemptConventionPlugin"
+        }
     }
 }

@@ -462,7 +462,7 @@ una vez y los tres gates reutilizan esa corrida.
 
 ## 🎨 Calidad de código
 
-ktlint + detekt + Android Lint están preconfigurados. Reglas en \`.editorconfig\`, \`config/detekt/detekt.yml\` y \`lint.xml\`. Se configuran una vez en \`build-logic/\` (convention plugins) y cada módulo Android los recibe con una línea; la receta para sumar un módulo está en \`AGENTS.md\`.
+ktlint + detekt + Android Lint están preconfigurados. Reglas en \`.editorconfig\`, \`config/detekt/detekt.yml\` y \`lint.xml\`. Se configuran una vez en \`build-logic/\` (convention plugins) y cada módulo Android los recibe con una línea; la receta para sumar un módulo está en \`AGENTS.md\`. Un módulo que aplica un plugin de Android o de Kotlin sin la convención de calidad hace fallar la configuración, para que no se quede sin gates sin avisar.
 
 \`\`\`bash
 # Antes de cada commit: formatea, verifica y compila los tests

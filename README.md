@@ -125,6 +125,18 @@ El script te preguntará el **nombre del proyecto**, el **package base**, el **n
 > El CI encadena `test koverVerifyDebug verifyRoborazziDebug` en una sola invocación: los tests corren
 > **una vez** y los tres gates reutilizan esa corrida.
 
+### 🧩 Sumar módulos
+
+Los gates (ktlint, detekt, Lint, Kover y Roborazzi) viven en `build-logic/`. Un módulo los recibe declarando
+`alias(libs.plugins.convention.android.library)` (o `…android.application`) en lugar del plugin de Android
+pelado; la receta completa está en `AGENTS.md`.
+
+Un módulo que aplica un plugin de Android o de Kotlin (`kotlin("jvm")`, `com.android.test`, Kotlin
+Multiplatform…) sin una convención de calidad **hace fallar la configuración** con un mensaje que lo explica:
+así no queda sin gates sin que nadie se entere. Para esos tipos de módulo la plantilla aún no trae gates, así
+que hay que escribir su convención en `build-logic/` o dejarlo sin gates a propósito con
+`alias(libs.plugins.convention.quality.exempt)`.
+
 ### 📊 Reportes
 
 Cada herramienta emite dos formatos: uno HTML para leerlo y uno XML para que lo ingiera Sonar (u otra

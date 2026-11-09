@@ -77,3 +77,4 @@ roborazzi = { id = "io.github.takahirom.roborazzi", version.ref = "roborazzi" }
 convention-android-application = { id = "convention.android.application" }
 convention-android-library = { id = "convention.android.library" }
 convention-ktlint = { id = "convention.ktlint" }
+convention-quality-exempt = { id = "convention.quality-exempt" }
