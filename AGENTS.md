@@ -67,7 +67,8 @@ Sigue el perfil (Clean Architecture + MVVM con UDF, por features). Particularida
 ## Git
 
 - Commits: Conventional Commits, en español, sin emoji. Agrupados por unidad funcional: cada commit compila y pasa el DoD.
-- Rama principal: `main`. Se trabaja en ramas cortas y se integra por PR con squash.
+- Rama principal: `main`.
+- **Flujo de integración (lo declara cada proyecto; cámbialo aquí si el tuyo es otro):** ramas cortas e integración por PR con squash. La alternativa es trabajar directo en `main`, sin ramas ni PR. Los agentes y las skills `hb-*` siguen lo que diga esta línea, así que corrígela antes de pedirles commits o PRs.
 - **La IA no commitea:** deja los cambios sin commitear y entrega el mensaje. Tampoco hace `push`, `tag` ni `merge`.
 
 ## Versionado y release
