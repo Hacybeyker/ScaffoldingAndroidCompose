@@ -94,7 +94,7 @@ El script te preguntará el **nombre del proyecto**, el **package base** y el **
 ./gradlew test
 
 # Calidad de código (ktlint + detekt + Android Lint)
-./gradlew formatAndAnalyze     # formatea y verifica todo
+./gradlew formatAndAnalyze     # formatea, verifica y compila los tests
 ./gradlew codeQuality          # solo verifica (ideal para CI)
 
 # Reportes HTML navegables (imprime las rutas file:// al terminar)

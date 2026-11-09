@@ -16,7 +16,7 @@ App Android nativa con Jetpack Compose, generada desde ScaffoldingAndroidCompose
 | --- | --- |
 | Compilar | `./gradlew assembleDebug` |
 | Tests unitarios y de screenshots (JVM) | `./gradlew test` |
-| Formatear y analizar | `./gradlew formatAndAnalyze` |
+| Formatear, analizar y compilar los tests | `./gradlew formatAndAnalyze` |
 | Regrabar goldens tras un cambio visual intencional | `./gradlew recordRoborazziDebug` |
 | Reportes HTML de Lint, detekt, ktlint y Kover | `./gradlew qualityReports --continue` |
 | Hook de calidad (una vez, tras clonar) | `./scripts/setup-quality-hook.sh` |

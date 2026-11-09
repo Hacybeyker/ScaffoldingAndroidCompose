@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jlleitschuh.gradle.ktlint.tasks.KtLintCheckTask
 
 plugins {
@@ -148,10 +149,15 @@ listOf("detekt", "lint").forEach { check ->
     tasks.named(check) { mustRunAfter("ktlintFormat") }
 }
 
+// ktlint, detekt y lint no compilan los tests: sin esta dependencia, un tipo movido pasa el paso 1 del
+// DoD y rompe recién en `test`. Es el mismo trabajo previo que `test` necesita, así que no se paga dos veces.
+tasks.withType<KotlinCompile>().configureEach { mustRunAfter("ktlintFormat") }
+
 tasks.register("formatAndAnalyze") {
     group = "verification"
-    description = "Formatea el codigo (ktlintFormat) y luego verifica todo (ktlintCheck + detekt + lint)."
-    dependsOn("ktlintFormat", "codeQuality")
+    description =
+        "Formatea el codigo (ktlintFormat), verifica todo (ktlintCheck + detekt + lint) y compila los tests."
+    dependsOn("ktlintFormat", "codeQuality", "assembleDebugUnitTest")
 }
 
 val htmlReports =

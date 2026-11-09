@@ -55,6 +55,7 @@
 - `release.yml` corre los mismos gates de cobertura y goldens antes de publicar artefactos.
 - `AGENTS.md`: reglas duras nuevas (no ejecutar en emulador/dispositivo, no commitear por cuenta propia, no bajar un gate para que pase el build, naming sin sufijo `Impl`).
 - `compose_stability.conf` marca `androidx.lifecycle.ViewModel` como estable para mejorar la *skippability* de los composables.
+- **`formatAndAnalyze` también compila los tests** (`assembleDebugUnitTest`). ktlint, detekt y Lint no los compilan, así que un tipo movido de paquete pasaba el paso 1 del DoD y rompía recién en `test`. Es el mismo trabajo previo que `test` necesita, así que el DoD no lo paga dos veces; `codeQuality`, el gate rápido del CI, no cambia.
 
 ### Removed
 - `res/values/colors.xml`: los siete colores del template de Android Studio no los usaba nadie (el tema Compose vive en `core/designsystem/Color.kt`) y generaban siete warnings de `UnusedResources` en cada build.

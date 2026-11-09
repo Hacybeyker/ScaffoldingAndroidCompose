@@ -436,7 +436,7 @@ una vez y los tres gates reutilizan esa corrida.
 ktlint + detekt + Android Lint están preconfigurados. Reglas en \`.editorconfig\`, \`config/detekt/detekt.yml\` y \`lint.xml\`.
 
 \`\`\`bash
-# Antes de cada commit: formatea y verifica todo
+# Antes de cada commit: formatea, verifica y compila los tests
 ./gradlew formatAndAnalyze
 
 # Solo verificación (CI / pre-push)
