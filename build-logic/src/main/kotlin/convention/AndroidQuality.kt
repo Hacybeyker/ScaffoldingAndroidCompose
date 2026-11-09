@@ -1,6 +1,7 @@
 package convention
 
 import com.android.build.api.dsl.Lint
+import dev.detekt.gradle.Detekt
 import dev.detekt.gradle.extensions.DetektExtension
 import io.github.takahirom.roborazzi.RoborazziExtension
 import java.io.File
@@ -138,16 +139,22 @@ internal fun Project.applyAndroidQualityGates() {
         dependsOn("detekt", "detektMain", "detektTest", "lint")
     }
 
-    // El orden se declara sobre cada check por source set (ktlintMainSourceSetCheck, ...): un mustRunAfter
-    // sobre el agregado ktlintCheck solo lo ordena a él, y sus subtareas arrancan antes que el formato.
+    // Todo lo que lee las fuentes corre después del formato. Si no, analiza o genera sobre código que el formato
+    // está a punto de cambiar y, en la corrida siguiente, se vuelve a ejecutar porque sus entradas cambiaron. El
+    // orden va sobre cada tarea concreta: un mustRunAfter sobre un agregado (lint, ktlintCheck) solo ordena al
+    // agregado, no a las tareas de las que depende.
+    tasks.withType<Detekt>().configureEach { mustRunAfter("ktlintFormat") }
+    tasks.withType<KotlinCompile>().configureEach { mustRunAfter("ktlintFormat") }
     tasks.configureEach {
-        if (name == "detekt" || name == "lint") mustRunAfter("ktlintFormat")
+        val readsSources =
+            name.startsWith("lintAnalyze") ||
+                name.startsWith("lintVitalAnalyze") ||
+                (name.startsWith("ksp") && name.endsWith("Kotlin"))
+        if (readsSources) mustRunAfter("ktlintFormat")
     }
 
     // ktlint, detekt y lint no compilan los tests: sin esta dependencia, un tipo movido pasa el paso 1 del
     // DoD y rompe recién en `test`. Es el mismo trabajo previo que `test` necesita, así que no se paga dos veces.
-    tasks.withType<KotlinCompile>().configureEach { mustRunAfter("ktlintFormat") }
-
     tasks.named("formatAndAnalyze") {
         description =
             "Formatea el codigo (ktlintFormat), verifica todo (ktlintCheck + detekt + lint) y compila los tests."
