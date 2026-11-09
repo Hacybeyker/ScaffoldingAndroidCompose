@@ -19,6 +19,25 @@ while IFS= read -r -d '' file; do
     STAGED_KOTLIN+=("$file")
 done < <(git diff --cached --name-only -z --diff-filter=ACMR -- '*.kt' '*.kts')
 
+# formatAndAnalyze analiza el árbol de trabajo, no el índice, y el hook re-stagea el archivo entero. Si un
+# archivo tiene cambios en stage Y fuera de stage, el commit se llevaría la parte que la persona dejó fuera
+# a propósito, así que se aborta antes de correr Gradle.
+if [ ${#STAGED_KOTLIN[@]} -gt 0 ]; then
+    PARTIAL=()
+    while IFS= read -r -d '' file; do
+        PARTIAL+=("$file")
+    done < <(GIT_LITERAL_PATHSPECS=1 git diff --name-only -z -- "${STAGED_KOTLIN[@]}")
+    if [ ${#PARTIAL[@]} -gt 0 ]; then
+        echo "❌ Commit bloqueado — hay archivos Kotlin con cambios en stage y fuera de stage:"
+        printf '     %s\n' "${PARTIAL[@]}"
+        echo "   Los gates analizan el árbol de trabajo, no el índice, y el hook re-stagea el archivo entero,"
+        echo "   así que el commit se llevaría también lo que dejaste fuera."
+        echo "   Haz stage del archivo completo (git add <archivo>) o separa el resto con"
+        echo "   'git stash push --keep-index', commitea y recupéralo con 'git stash pop'."
+        exit 1
+    fi
+fi
+
 BEFORE=()
 for file in "${STAGED_KOTLIN[@]}"; do
     BEFORE+=("$(git hash-object -- "$file")")

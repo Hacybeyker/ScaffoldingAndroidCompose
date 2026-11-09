@@ -79,5 +79,6 @@
 - Un nombre visible con `&`, `|`, `\`, comillas o un `@`/`?` al inicio rompía el reemplazo de `init-project.sh` o el `strings.xml`: ahora se escapa para sed, XML y aapt2.
 - `init-project.sh` valida el usuario de GitHub con las reglas de GitHub, y el aviso final ya no sugiere volver a correr el script, que no se puede ejecutar dos veces.
 - **El pre-commit hook también formatea los archivos renombrados.** El filtro `--diff-filter=ACM` dejaba fuera los renombrados (`R`): con `git mv` y un error de formato, `formatAndAnalyze` formateaba el árbol pero el commit se llevaba la versión sin formatear y el hook no avisaba. Ahora el filtro es `ACMR`. Quien ya tenga el hook instalado debe volver a correr `./scripts/setup-quality-hook.sh`.
+- **El pre-commit hook se niega a commitear un archivo Kotlin con cambios en stage y fuera de stage.** `formatAndAnalyze` analiza el árbol de trabajo, no el índice, y el hook re-stageaba el archivo entero: con `git add -p` o un commit parcial, el commit se llevaba también lo que la persona había dejado fuera, justo lo que el comentario del hook decía evitar. Ahora aborta antes de correr Gradle, nombra los archivos y explica cómo seguir (stage completo, o `git stash push --keep-index`).
 
 [Unreleased]: https://github.com/Hacybeyker/ScaffoldingAndroidCompose/commits/main
