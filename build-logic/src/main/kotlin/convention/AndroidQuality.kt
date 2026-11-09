@@ -23,10 +23,12 @@ private val htmlReports =
         "Kover (cobertura)" to "kover/htmlDebug/index.html"
     )
 
-internal fun Lint.applyLintGates(lintFile: File) {
+// checkDependencies solo en la aplicación: con true también en las librerías, el issue de una librería salía
+// en el reporte de cada módulo que depende de ella además del suyo.
+internal fun Lint.applyLintGates(lintFile: File, checkDependencies: Boolean) {
     abortOnError = true
     warningsAsErrors = false
-    checkDependencies = true
+    this.checkDependencies = checkDependencies
     checkReleaseBuilds = true
     lintConfig = lintFile
 }

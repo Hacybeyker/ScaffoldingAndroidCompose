@@ -10,7 +10,7 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
         with(target) {
             pluginManager.apply("com.android.application")
             extensions.configure<ApplicationExtension> {
-                lint { applyLintGates(layout.settingsDirectory.file("lint.xml").asFile) }
+                lint { applyLintGates(layout.settingsDirectory.file("lint.xml").asFile, checkDependencies = true) }
                 testOptions { unitTests { isIncludeAndroidResources = true } }
             }
             applyAndroidQualityGates()

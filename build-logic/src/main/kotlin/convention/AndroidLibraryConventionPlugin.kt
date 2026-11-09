@@ -10,7 +10,7 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
         with(target) {
             pluginManager.apply("com.android.library")
             extensions.configure<LibraryExtension> {
-                lint { applyLintGates(layout.settingsDirectory.file("lint.xml").asFile) }
+                lint { applyLintGates(layout.settingsDirectory.file("lint.xml").asFile, checkDependencies = false) }
                 testOptions { unitTests { isIncludeAndroidResources = true } }
             }
             applyAndroidQualityGates()
