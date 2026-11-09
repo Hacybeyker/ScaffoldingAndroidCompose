@@ -19,7 +19,7 @@ Clona, ejecuta un script, y en menos de un minuto tienes un proyecto Android con
 | **`AGENTS.md`** | Reglas del proyecto para agentes de IA (estándar [agents.md](https://agents.md/)); `CLAUDE.md` lo importa para Claude Code |
 | **Skills globales** | Las skills [hb-*](https://github.com/Hacybeyker/agent-skills) (implementar, revisar, commits, releases) se instalan una vez por máquina, no por proyecto |
 | **Catálogo de versiones** | `gradle/libs.versions.toml` centralizado (Kotlin 2.4, AGP 9, Compose BOM), mantenido al día por Dependabot |
-| **Calidad de código** | **ktlint + detekt + Android Lint** preconfigurados con tareas agregadas (`./gradlew formatAndAnalyze`) — reglas en `.editorconfig`, `config/detekt/detekt.yml` y `lint.xml`. Se configuran una vez en el `build.gradle.kts` raíz y se aplican a cada módulo Android, así que la plantilla está lista para sumar módulos (receta en `AGENTS.md`) |
+| **Calidad de código** | **ktlint + detekt + Android Lint** preconfigurados con tareas agregadas (`./gradlew formatAndAnalyze`) — reglas en `.editorconfig`, `config/detekt/detekt.yml` y `lint.xml`. Se configuran una vez en `build-logic/` (convention plugins) y cada módulo Android los recibe con una línea, así que la plantilla está lista para sumar módulos (receta en `AGENTS.md`) |
 | **Cobertura con gate** | **Kover** al 90% sobre `domain`/`data`/`ViewModels` (codegen y frontera de plataforma excluidos) |
 | **Reportes HTML** | `./gradlew qualityReports` genera los cuatro (Lint, detekt, ktlint y Kover) e imprime sus rutas `file://` |
 | **Análisis estático en la nube** | **SonarQube/SonarCloud opcional**, alimentado por los reportes de Lint/detekt/ktlint/Kover. Es opt-in: sin el secret `SONAR_TOKEN` el paso se salta y el CI queda verde |
@@ -90,6 +90,7 @@ El script te preguntará el **nombre del proyecto**, el **package base**, el **n
 │       ├── data/          #   repository/: InMemoryGreetingRepository
 │       ├── ui/            #   Screen/Content + ViewModel + UiState/Action + NavKey + Navigation (entry builder)
 │       └── di/            #   HomeModule (Hilt, @Binds)
+├── build-logic/           # Convention plugins: ktlint, detekt, Lint, Kover y Roborazzi de cada módulo
 ├── AGENTS.md              # Reglas del proyecto para agentes de IA
 ├── CLAUDE.md              # Importa AGENTS.md para Claude Code
 ├── init-project.sh        # ⚡ Inicializador del scaffolding

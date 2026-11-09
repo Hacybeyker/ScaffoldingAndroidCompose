@@ -427,6 +427,7 @@ $GH_TODO
 │   ├── core/              # Compartido (design tokens en core/designsystem/)
 │   ├── navigation/        # AppNavDisplay (Navigation 3)
 │   └── feature/<name>/    # Por features: domain / data / ui / di
+├── build-logic/           # Convention plugins: ktlint, detekt, Lint, Kover y Roborazzi de cada módulo
 ├── AGENTS.md              # Reglas del proyecto para agentes de IA (CLAUDE.md lo importa)
 └── gradle/
     └── libs.versions.toml # Catálogo centralizado de versiones
@@ -461,7 +462,7 @@ una vez y los tres gates reutilizan esa corrida.
 
 ## 🎨 Calidad de código
 
-ktlint + detekt + Android Lint están preconfigurados. Reglas en \`.editorconfig\`, \`config/detekt/detekt.yml\` y \`lint.xml\`. Se configuran una vez en el \`build.gradle.kts\` raíz y se aplican a cada módulo Android; la receta para sumar un módulo está en \`AGENTS.md\`.
+ktlint + detekt + Android Lint están preconfigurados. Reglas en \`.editorconfig\`, \`config/detekt/detekt.yml\` y \`lint.xml\`. Se configuran una vez en \`build-logic/\` (convention plugins) y cada módulo Android los recibe con una línea; la receta para sumar un módulo está en \`AGENTS.md\`.
 
 \`\`\`bash
 # Antes de cada commit: formatea, verifica y compila los tests

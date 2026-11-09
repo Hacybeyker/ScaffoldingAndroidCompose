@@ -1,5 +1,5 @@
 plugins {
-    alias(libs.plugins.android.application)
+    alias(libs.plugins.convention.android.application)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.hilt)
@@ -37,7 +37,7 @@ android {
 }
 
 composeCompiler {
-    stabilityConfigurationFiles.add(rootProject.layout.projectDirectory.file("compose_stability.conf"))
+    stabilityConfigurationFiles.add(layout.settingsDirectory.file("compose_stability.conf"))
 }
 
 dependencies {
