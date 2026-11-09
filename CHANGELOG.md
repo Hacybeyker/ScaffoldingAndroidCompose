@@ -30,6 +30,7 @@
 - **Screenshot testing con Roborazzi + Robolectric**: goldens versionados en `app/src/test/screenshots/`, con `verifyRoborazziDebug` como gate y un golden de ejemplo de `HomeContent` (light y dark).
 - Tests de ejemplo que faltaban para cubrir el slice completo: `ObserveGreetingUseCaseTest` e `InMemoryGreetingRepositoryTest`.
 - `build-scan-publish` en CI: cada run publica un Build Scan para diagnosticar fallos sin repetirlos.
+- **README: sección «Qué no incluye»** (red, persistencia e imágenes) y la aclaración de que la navegación es Navigation 3 (`NavDisplay`, `rememberNavBackStack`, `entryProvider`) y no Navigation Compose (`NavHost`, `NavController`): quien parte de un brief que dice «Navigation Compose» o «Retrofit» ahora ve de entrada que ni una ni lo otro vienen en la base.
 
 ### Changed
 - `init-project.sh --help` lee el encabezado completo en vez de un rango fijo de líneas, que deja de mostrar la ayuda entera en cuanto esta crece.

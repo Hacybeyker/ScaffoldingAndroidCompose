@@ -28,6 +28,20 @@ Clona, ejecuta un script, y en menos de un minuto tienes un proyecto Android con
 | **Release endurecido** | **R8** activo (`optimization`), keep rules en `src/main/keepRules/`, `lint.abortOnError = true` |
 | **Testing** | JUnit + Turbine + Fakes escritos a mano, con `MainDispatcherRule` y tests de ejemplo (UseCase + Repository + ViewModel + golden). Todo en JVM: **sin `androidTest`** |
 
+## 🚫 Qué no incluye
+
+La plantilla es la base de la app, no una app completa. Todo lo siguiente se agrega en
+`gradle/libs.versions.toml` y, dentro de cada feature, en `data/` (el contrato de `domain/repository` no cambia):
+
+| Área | Qué falta | Hoy |
+|------|-----------|-----|
+| **Red** | Retrofit, OkHttp, Ktor y `kotlinx-serialization-json` | `kotlinx-serialization-core` solo serializa las `NavKey`; no hay cliente HTTP ni parseo de JSON |
+| **Persistencia** | Room y DataStore | La feature de ejemplo guarda el estado en memoria (`InMemoryGreetingRepository`) |
+| **Imágenes** | Coil, Glide o similares | `material-icons-core` trae solo los íconos básicos |
+| **Navigation Compose** | `NavHost` y `NavController` | La navegación es **Navigation 3** (`androidx.navigation3`: `NavDisplay`, `rememberNavBackStack` y `entryProvider`). Es otra librería, con otras APIs: los ejemplos de Navigation Compose no se copian tal cual |
+
+Tampoco trae tests instrumentados (todo corre en la JVM) ni la firma de release (ver `release.yml`).
+
 ## 📋 Requisitos
 
 - **JDK 21** (Gradle lo descarga automáticamente vía toolchain si no lo tienes)
