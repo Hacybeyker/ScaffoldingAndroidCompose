@@ -52,7 +52,7 @@ Sigue el perfil (Clean Architecture + MVVM con UDF, por features). Particularida
 - **No bajes un gate para que pase el build** (`abortOnError = false`, bajar `minBound`, `ignoreFailures`): arregla la causa.
 - **No ejecutes la app** en un emulador ni en un dispositivo. La verificación automática llega hasta `assembleDebug` y `test`; lo que necesita hardware lo prueba la persona, así que indícale qué abrir y qué observar.
 - Dependencias solo estables. Una excepción exige autorización explícita y queda documentada aquí con su contención:
-  - **`detekt = 2.0.0-alpha.x`:** la rama 1.23.x no soporta Kotlin 2.4, así que la alternativa es quedarse sin detekt. Contención: `config/detekt/detekt.yml` corre con `config.validation: false` para tolerar renombres de reglas entre alphas, y `buildUponDefaultConfig = true` limita los overrides al archivo. Vuelve a estable cuando detekt 2.0.0 sea GA.
+  - **`detekt = 2.0.0-alpha.x`:** la rama 1.23.x no soporta Kotlin 2.4, así que la alternativa es quedarse sin detekt. Contención: `config/detekt/detekt.yml` corre con `config.validation: false` para tolerar renombres de reglas entre alphas, y `buildUponDefaultConfig = true` limita los overrides al archivo. Con la validación apagada, una clave que la alpha no conoce se ignora sin avisar y la regla aplica su umbral por defecto (las claves de la 1.23 como `thresholdInClasses` ya no hacen nada; en la 2.0 son `allowedFunctionsPerClass` y similares): al subir de alpha, comprueba cada umbral con un caso temporal. Vuelve a estable cuando detekt 2.0.0 sea GA.
 
 ## Git
 

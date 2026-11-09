@@ -6,6 +6,11 @@
 #
 # La validacion se desactiva para tolerar diferencias de nombres de reglas
 # entre versiones de detekt (1.23.x vs 2.0.x).
+#
+# OJO: con la validacion apagada, una clave que la version instalada no conoce se ignora SIN avisar
+# y la regla aplica su umbral por defecto. Las claves de abajo son las de la 2.0 (allowed*); las de
+# la 1.23 (threshold, thresholdInClasses, functionThreshold...) ya no hacen nada. Al cambiar de
+# alpha, comprueba cada umbral con un caso temporal en vez de dar el yml por bueno.
 config:
   validation: false
 
@@ -22,14 +27,14 @@ naming:
 
 complexity:
   LongMethod:
-    threshold: 80
+    allowedLines: 80
   LongParameterList:
-    functionThreshold: 8
-    constructorThreshold: 8
+    allowedFunctionParameters: 8
+    allowedConstructorParameters: 8
     ignoreAnnotated: ['Composable']
   TooManyFunctions:
-    thresholdInFiles: 30
-    thresholdInClasses: 30
+    allowedFunctionsPerFile: 30
+    allowedFunctionsPerClass: 30
 
 # --- Style: el FORMATO lo gobierna ktlint (single source of truth) ----------
 # Para no reportar dos veces lo mismo, se desactivan en detekt las reglas que
