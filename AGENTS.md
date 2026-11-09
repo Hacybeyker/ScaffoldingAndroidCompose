@@ -37,6 +37,14 @@ Antes de dar una tarea por terminada, en este orden:
 Sigue el perfil (Clean Architecture + MVVM con UDF, por features). Particularidades de este proyecto:
 
 - Un solo módulo, `{{MODULE_NAME}}`, con los paquetes `core/`, `navigation/` y `feature/<nombre>/`. Los design tokens están en `core/designsystem/`.
+- **La calidad se configura una vez, en el `build.gradle.kts` raíz:** ktlint, detekt, Lint, Kover y Roborazzi se aplican solos a cada módulo que declare `com.android.application` o `com.android.library`. Ningún módulo los declara ni los configura, así que uno nuevo no puede quedarse sin gates, y los comandos del DoD corren desde la raíz sobre todos los módulos. Si hace falta una opción nueva común, va en `subprojects {}` del raíz, en `ApplicationExtension` **y** en `LibraryExtension` (en AGP 9, `CommonExtension` no expone `testOptions`).
+- **Sumar un módulo library** (por ejemplo `:core-data`), sin tocar la configuración de calidad:
+  1. `include(":core-data")` en `settings.gradle.kts`.
+  2. `core-data/src/main/AndroidManifest.xml` con `<manifest />`.
+  3. `core-data/build.gradle.kts` con `plugins { alias(libs.plugins.android.library) }`, un bloque `android` (`namespace`, `compileSdk { version = release(37) }`, `defaultConfig { minSdk = 26 }` y `compileOptions` en Java 11) y sus dependencias, por ejemplo `testImplementation(libs.junit)`. Otros plugins (Hilt, Compose, KSP) solo si el módulo los usa.
+  4. Quien lo use declara `implementation(project(":core-data"))`.
+  5. Corre el DoD completo desde la raíz: debe quedar en verde con el módulo incluido.
+  Kover mide al 90 % las clases `*.domain.*`, `*.data.*` y `*ViewModel*` de cada módulo: si el módulo las tiene, necesita sus tests.
 - Cada feature declara su NavKey en `ui/<Feature>NavKey.kt` y su entry builder en `ui/<Feature>Navigation.kt`; `navigation/AppNavDisplay.kt` solo arma el back stack y junta los entry builders.
 - `feature/home` es el ejemplo del template: `init-project.sh` lo reduce a una pantalla mínima (`HomeNavKey`, `homeEntry()` y `HomeScreen`).
 - **Sin tests instrumentados:** no existe `androidTest`. El código que depende de hardware (cámara, GPS, biometría, sensores) se verifica a mano en un dispositivo y se excluye del gate de cobertura.

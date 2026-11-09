@@ -74,7 +74,7 @@ Ningún valor del autor de la plantilla sobrevive al init. Estos son los cuatro 
 | Entrada | Deriva |
 |---------|--------|
 | `--name` | `rootProject.name`, theme Compose, `sonar.projectName`, nombre de la carpeta raíz, ficheros `.iml` |
-| `--package` | `namespace`, `applicationId`, declaraciones `package`/`import`, patrones de clases de Kover, `sonar.projectKey` |
+| `--package` | `namespace`, `applicationId`, declaraciones `package`/`import`, `sonar.projectKey` |
 | `--app-name` | `app_name` en `strings.xml` (lo que se ve en el launcher) |
 | `--github-user` | Badges del README, links del CHANGELOG y, si no pasas `--sonar-org`, `sonar.organization` |
 
@@ -94,7 +94,6 @@ Si omites `--github-user` y `--sonar-org`, el script deja los placeholders `TU_U
 | **Kotlin** | `app/src/**/*.kt` | Imports **reordenados** (el package nuevo puede caer antes o después de `androidx`; ktlint los exige lexicográficos) |
 | **Ejemplo** | `feature/home/**` (main + test) | Feature de ejemplo eliminada (`domain/`, `data/`, `di/`, ViewModel + UiState/Action); quedan un `HomeScreen` mínimo, `HomeNavKey.kt` y `HomeNavigation.kt` |
 | **Screenshots** | `app/src/test/screenshots/` | Goldens del ejemplo eliminados (se regeneran con `recordRoborazziDebug`) |
-| **Cobertura** | `app/build.gradle.kts` | Patrones de clases de Kover (`<package>.*.domain.*`, `.data.*`, `*ViewModel*`) |
 | **SonarCloud** | `build.gradle.kts` | `projectKey` (del package), `projectName` (del nombre) y `{{SONAR_ORG}}` (de `--sonar-org` o `--github-user`) |
 | **Docs IA** | `AGENTS.md` | Placeholders `{{PROJECT_NAME}}`, `{{PACKAGE_NAME}}`, `{{MODULE_NAME}}`, `{{PACKAGE_PATH}}`, `{{PROJECT_ROOT}}` |
 | **IntelliJ/Android Studio** | `.idea/*.iml`, `.idea/modules.xml`, `.idea/.name` | Renombrados con el nuevo nombre del proyecto |
